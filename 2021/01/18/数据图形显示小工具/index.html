@@ -20,19 +20,24 @@
     var CONFIG = {"hostname":"aya-lxl.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
+  <meta name="description" content="1 来历采用python编写的一个小工具，用来对接收到的数据进行图形化显示，目的是方便观察数据的波动。如果在考虑其它一些功能，比如计算均值、方差等，则可以更全面的对数据进行描述与解释。 因为工作中某个项目的原因，需要通过比例调节阀来控制液体流速。而控制比例调节阀的基础就是液体的流速，而测量流速的准确性关系到实际调节的准确性。所以该工具的目的就是在软件调试阶段，对流速测量与比例调节阀调节准确性进行评">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Hello World">
-<meta property="og:url" content="https://aya-lxl.github.io/2021/01/17/hello-world/index.html">
+<meta property="og:title" content="数据图形显示小工具">
+<meta property="og:url" content="https://aya-lxl.github.io/2021/01/18/%E6%95%B0%E6%8D%AE%E5%9B%BE%E5%BD%A2%E6%98%BE%E7%A4%BA%E5%B0%8F%E5%B7%A5%E5%85%B7/index.html">
 <meta property="og:site_name" content="直到海角天涯">
-<meta property="og:description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
+<meta property="og:description" content="1 来历采用python编写的一个小工具，用来对接收到的数据进行图形化显示，目的是方便观察数据的波动。如果在考虑其它一些功能，比如计算均值、方差等，则可以更全面的对数据进行描述与解释。 因为工作中某个项目的原因，需要通过比例调节阀来控制液体流速。而控制比例调节阀的基础就是液体的流速，而测量流速的准确性关系到实际调节的准确性。所以该工具的目的就是在软件调试阶段，对流速测量与比例调节阀调节准确性进行评">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2021-01-17T05:17:54.292Z">
-<meta property="article:modified_time" content="2021-01-17T05:17:54.292Z">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/18/sce2qO.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/18/scecM6.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/18/scegsK.png">
+<meta property="article:published_time" content="2021-01-18T11:41:53.000Z">
+<meta property="article:modified_time" content="2021-01-18T11:50:54.466Z">
 <meta property="article:author" content="lxl">
+<meta property="article:tag" content="工具 python 图形显示">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s3.ax1x.com/2021/01/18/sce2qO.png">
 
-<link rel="canonical" href="https://aya-lxl.github.io/2021/01/17/hello-world/">
+<link rel="canonical" href="https://aya-lxl.github.io/2021/01/18/%E6%95%B0%E6%8D%AE%E5%9B%BE%E5%BD%A2%E6%98%BE%E7%A4%BA%E5%B0%8F%E5%B7%A5%E5%85%B7/">
 
 
 <script id="page-configurations">
@@ -45,7 +50,7 @@
   };
 </script>
 
-  <title>Hello World | 直到海角天涯</title>
+  <title>数据图形显示小工具 | 直到海角天涯</title>
   
 
 
@@ -160,7 +165,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://aya-lxl.github.io/2021/01/17/hello-world/">
+    <link itemprop="mainEntityOfPage" href="https://aya-lxl.github.io/2021/01/18/%E6%95%B0%E6%8D%AE%E5%9B%BE%E5%BD%A2%E6%98%BE%E7%A4%BA%E5%B0%8F%E5%B7%A5%E5%85%B7/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -173,7 +178,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          Hello World
+          数据图形显示小工具
         </h1>
 
         <div class="post-meta">
@@ -182,8 +187,18 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2021-01-17 13:17:54" itemprop="dateCreated datePublished" datetime="2021-01-17T13:17:54+08:00">2021-01-17</time>
+              <time title="创建时间：2021-01-18 19:41:53 / 修改时间：19:50:54" itemprop="dateCreated datePublished" datetime="2021-01-18T19:41:53+08:00">2021-01-18</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E5%85%B7/" itemprop="url" rel="index"><span itemprop="name">工具</span></a>
+                </span>
             </span>
 
           
@@ -197,15 +212,19 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+        <h2 id="1-来历"><a href="#1-来历" class="headerlink" title="1 来历"></a>1 来历</h2><p>采用python编写的一个小工具，用来对接收到的数据进行图形化显示，目的是方便观察数据的波动。如果在考虑其它一些功能，比如计算均值、方差等，则可以更全面的对数据进行描述与解释。</p>
+<p>因为工作中某个项目的原因，需要通过比例调节阀来控制液体流速。而控制比例调节阀的基础就是液体的流速，而测量流速的准确性关系到实际调节的准确性。所以该工具的目的就是在软件调试阶段，对流速测量与比例调节阀调节准确性进行评估，以便改进软件。</p>
+<h2 id="2-原理"><a href="#2-原理" class="headerlink" title="2 原理"></a>2 原理</h2><p>软件主要用到2个库：matplotlib、serial。</p>
+<p>首先打开串口，当然需要设置串口的参数，诸如波特率、校验等。当接收到数据时，进行绘图。这里有2种方法，（1）每次只画一个点，之前的点不清除；（2）每次清除之前的点，重新绘制所有的点，包括新接收到的点。显而易见，第二种方法比较耗费资源。两种方法的图形如下所示。</p>
+<p><img src="https://s3.ax1x.com/2021/01/18/sce2qO.png" alt="sce2qO.png"></p>
+<p><img src="https://s3.ax1x.com/2021/01/18/scecM6.png" alt="scecM6.png"></p>
+<p>其实，两种方法都可以看出动态效果，但是第二种方法画出的点是连在一起的显。</p>
+<h2 id="3-工况"><a href="#3-工况" class="headerlink" title="3 工况"></a>3 工况</h2><p>再来看一下实际中需要测量的液体流速。</p>
+<p><img src="https://s3.ax1x.com/2021/01/18/scegsK.png" alt="scegsK.png"></p>
+<p>可以看到尖峰存在，而且是两种峰值，似乎也有一定的周期性，猜想可能是某种系统性的原因引起的，可能是软件引起的，也可能是硬件引起的，或者干脆就是泵的稳定性有点差。</p>
+<p>但是数据仍稳定在一个较小的区间之内，比如上述图形数据的均值为89.41，标准差为0.13.</p>
+<p>如果存在外部的、独立的流速测量仪器，那么可以将其作为基准使用。但是，因为条件的限制，只能使用目前这种方法来调试。另外一个比较重要的原因是，该设备对流速没有很高的精度要求，每分钟40L或者45L影响不大，但是不能是每分钟80L。</p>
+<h2 id="4-结尾"><a href="#4-结尾" class="headerlink" title="4 结尾"></a>4 结尾</h2><p>该小程序只是个人作为调试使用的，为了方便工作。如果有需要，还可以增加串口参数设置、接收数据统计显示、数据保存等功能。</p>
 
     </div>
 
@@ -214,17 +233,20 @@
     
 
       <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%B7%A5%E5%85%B7-python-%E5%9B%BE%E5%BD%A2%E6%98%BE%E7%A4%BA/" rel="tag"># 工具 python 图形显示</a>
+          </div>
 
         
 
 
         
     <div class="post-nav">
-      <div class="post-nav-item"></div>
       <div class="post-nav-item">
-    <a href="/2021/01/17/hexo%E5%AE%89%E8%A3%85/" rel="next" title="hexo安装">
-      hexo安装 <i class="fa fa-chevron-right"></i>
+    <a href="/2021/01/17/hexo%E5%AE%89%E8%A3%85/" rel="prev" title="hexo安装">
+      <i class="fa fa-chevron-left"></i> hexo安装
     </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -283,7 +305,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Quick-Start"><span class="nav-number">1.</span> <span class="nav-text">Quick Start</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Create-a-new-post"><span class="nav-number">1.1.</span> <span class="nav-text">Create a new post</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Run-server"><span class="nav-number">1.2.</span> <span class="nav-text">Run server</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Generate-static-files"><span class="nav-number">1.3.</span> <span class="nav-text">Generate static files</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Deploy-to-remote-sites"><span class="nav-number">1.4.</span> <span class="nav-text">Deploy to remote sites</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E6%9D%A5%E5%8E%86"><span class="nav-number">1.</span> <span class="nav-text">1 来历</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%8E%9F%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text">2 原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E5%B7%A5%E5%86%B5"><span class="nav-number">3.</span> <span class="nav-text">3 工况</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E7%BB%93%E5%B0%BE"><span class="nav-number">4.</span> <span class="nav-text">4 结尾</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
