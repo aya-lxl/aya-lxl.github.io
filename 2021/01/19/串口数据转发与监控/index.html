@@ -20,24 +20,25 @@
     var CONFIG = {"hostname":"aya-lxl.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="1 来历采用python编写的一个小工具，用来对接收到的数据进行图形化显示，目的是方便观察数据的波动。如果在考虑其它一些功能，比如计算均值、方差等，则可以更全面的对数据进行描述与解释。 因为工作中某个项目的原因，需要通过比例调节阀来控制液体流速。而控制比例调节阀的基础就是液体的流速，而测量流速的准确性关系到实际调节的准确性。所以该工具的目的就是在软件调试阶段，对流速测量与比例调节阀调节准确性进行评">
+  <meta name="description" content="这个小软件是在某个项目中作为附属开发的工具，使用python开发。 起因说明该项目中，单片机与Android屏通信，接口使用RS-232。二者之间的通信协议继承之前的结构，并且增加了许多新的功能。屏与单片机均可以主动发送数据，数据错误的时候还会重新发送。 通过实际的操作发现，有时候在屏上的操作会没有反应，原因是单片机未接收到数据（这种处理方式是协议设计的原因，即屏只是用来显示而不处理数据，操作每个">
 <meta property="og:type" content="article">
-<meta property="og:title" content="数据图形显示小工具">
-<meta property="og:url" content="https://aya-lxl.github.io/2021/01/18/%E6%95%B0%E6%8D%AE%E5%9B%BE%E5%BD%A2%E6%98%BE%E7%A4%BA%E5%B0%8F%E5%B7%A5%E5%85%B7/index.html">
+<meta property="og:title" content="串口数据转发与监控">
+<meta property="og:url" content="https://aya-lxl.github.io/2021/01/19/%E4%B8%B2%E5%8F%A3%E6%95%B0%E6%8D%AE%E8%BD%AC%E5%8F%91%E4%B8%8E%E7%9B%91%E6%8E%A7/index.html">
 <meta property="og:site_name" content="直到海角天涯">
-<meta property="og:description" content="1 来历采用python编写的一个小工具，用来对接收到的数据进行图形化显示，目的是方便观察数据的波动。如果在考虑其它一些功能，比如计算均值、方差等，则可以更全面的对数据进行描述与解释。 因为工作中某个项目的原因，需要通过比例调节阀来控制液体流速。而控制比例调节阀的基础就是液体的流速，而测量流速的准确性关系到实际调节的准确性。所以该工具的目的就是在软件调试阶段，对流速测量与比例调节阀调节准确性进行评">
+<meta property="og:description" content="这个小软件是在某个项目中作为附属开发的工具，使用python开发。 起因说明该项目中，单片机与Android屏通信，接口使用RS-232。二者之间的通信协议继承之前的结构，并且增加了许多新的功能。屏与单片机均可以主动发送数据，数据错误的时候还会重新发送。 通过实际的操作发现，有时候在屏上的操作会没有反应，原因是单片机未接收到数据（这种处理方式是协议设计的原因，即屏只是用来显示而不处理数据，操作每个">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://s3.ax1x.com/2021/01/18/scnfCd.png">
-<meta property="og:image" content="https://s3.ax1x.com/2021/01/18/scngED.png">
-<meta property="og:image" content="https://s3.ax1x.com/2021/01/18/scnR4H.png">
-<meta property="article:published_time" content="2021-01-18T11:41:53.000Z">
-<meta property="article:modified_time" content="2021-01-18T12:09:41.348Z">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/19/s2wBHU.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/19/s2wrEF.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/19/s2waj0.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/01/19/s2wwuV.png">
+<meta property="article:published_time" content="2021-01-19T12:45:57.000Z">
+<meta property="article:modified_time" content="2021-01-19T12:49:57.799Z">
 <meta property="article:author" content="lxl">
-<meta property="article:tag" content="工具 python 图形显示">
+<meta property="article:tag" content="工具 python">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://s3.ax1x.com/2021/01/18/scnfCd.png">
+<meta name="twitter:image" content="https://s3.ax1x.com/2021/01/19/s2wBHU.png">
 
-<link rel="canonical" href="https://aya-lxl.github.io/2021/01/18/%E6%95%B0%E6%8D%AE%E5%9B%BE%E5%BD%A2%E6%98%BE%E7%A4%BA%E5%B0%8F%E5%B7%A5%E5%85%B7/">
+<link rel="canonical" href="https://aya-lxl.github.io/2021/01/19/%E4%B8%B2%E5%8F%A3%E6%95%B0%E6%8D%AE%E8%BD%AC%E5%8F%91%E4%B8%8E%E7%9B%91%E6%8E%A7/">
 
 
 <script id="page-configurations">
@@ -50,7 +51,7 @@
   };
 </script>
 
-  <title>数据图形显示小工具 | 直到海角天涯</title>
+  <title>串口数据转发与监控 | 直到海角天涯</title>
   
 
 
@@ -165,7 +166,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://aya-lxl.github.io/2021/01/18/%E6%95%B0%E6%8D%AE%E5%9B%BE%E5%BD%A2%E6%98%BE%E7%A4%BA%E5%B0%8F%E5%B7%A5%E5%85%B7/">
+    <link itemprop="mainEntityOfPage" href="https://aya-lxl.github.io/2021/01/19/%E4%B8%B2%E5%8F%A3%E6%95%B0%E6%8D%AE%E8%BD%AC%E5%8F%91%E4%B8%8E%E7%9B%91%E6%8E%A7/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -178,7 +179,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          数据图形显示小工具
+          串口数据转发与监控
         </h1>
 
         <div class="post-meta">
@@ -189,7 +190,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2021-01-18 19:41:53 / 修改时间：20:09:41" itemprop="dateCreated datePublished" datetime="2021-01-18T19:41:53+08:00">2021-01-18</time>
+              <time title="创建时间：2021-01-19 20:45:57 / 修改时间：20:49:57" itemprop="dateCreated datePublished" datetime="2021-01-19T20:45:57+08:00">2021-01-19</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -212,19 +213,22 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="1-来历"><a href="#1-来历" class="headerlink" title="1 来历"></a>1 来历</h2><p>采用python编写的一个小工具，用来对接收到的数据进行图形化显示，目的是方便观察数据的波动。如果在考虑其它一些功能，比如计算均值、方差等，则可以更全面的对数据进行描述与解释。</p>
-<p>因为工作中某个项目的原因，需要通过比例调节阀来控制液体流速。而控制比例调节阀的基础就是液体的流速，而测量流速的准确性关系到实际调节的准确性。所以该工具的目的就是在软件调试阶段，对流速测量与比例调节阀调节准确性进行评估，以便改进软件。</p>
-<h2 id="2-原理"><a href="#2-原理" class="headerlink" title="2 原理"></a>2 原理</h2><p>软件主要用到2个库：matplotlib、serial。</p>
-<p>首先打开串口，当然需要设置串口的参数，诸如波特率、校验等。当接收到数据时，进行绘图。这里有2种方法，（1）每次只画一个点，之前的点不清除；（2）每次清除之前的点，重新绘制所有的点，包括新接收到的点。显而易见，第二种方法比较耗费资源。两种方法的图形如下所示。</p>
-<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/scnfCd"><img src="https://s3.ax1x.com/2021/01/18/scnfCd.png" alt="scnfCd.png"></a></p>
-<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/scngED"><img src="https://s3.ax1x.com/2021/01/18/scngED.png" alt="scngED.png"></a></p>
-<p>其实，两种方法都可以看出动态效果，但是第二种方法画出的点是连在一起的显。</p>
-<h2 id="3-工况"><a href="#3-工况" class="headerlink" title="3 工况"></a>3 工况</h2><p>再来看一下实际中需要测量的液体流速。</p>
-<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/scnR4H"><img src="https://s3.ax1x.com/2021/01/18/scnR4H.png" alt="scnR4H.png"></a></p>
-<p>可以看到尖峰存在，而且是两种峰值，似乎也有一定的周期性，猜想可能是某种系统性的原因引起的，可能是软件引起的，也可能是硬件引起的，或者干脆就是泵的稳定性有点差。</p>
-<p>但是数据仍稳定在一个较小的区间之内，比如上述图形数据的均值为89.41，标准差为0.13.</p>
-<p>如果存在外部的、独立的流速测量仪器，那么可以将其作为基准使用。但是，因为条件的限制，只能使用目前这种方法来调试。另外一个比较重要的原因是，该设备对流速没有很高的精度要求，每分钟40L或者45L影响不大，但是不能是每分钟80L。</p>
-<h2 id="4-结尾"><a href="#4-结尾" class="headerlink" title="4 结尾"></a>4 结尾</h2><p>该小程序只是个人作为调试使用的，为了方便工作。如果有需要，还可以增加串口参数设置、接收数据统计显示、数据保存等功能。</p>
+        <p>这个小软件是在某个项目中作为附属开发的工具，使用python开发。</p>
+<h4 id="起因说明"><a href="#起因说明" class="headerlink" title="起因说明"></a>起因说明</h4><p>该项目中，单片机与Android屏通信，接口使用RS-232。二者之间的通信协议继承之前的结构，并且增加了许多新的功能。屏与单片机均可以主动发送数据，数据错误的时候还会重新发送。</p>
+<p>通过实际的操作发现，有时候在屏上的操作会没有反应，原因是单片机未接收到数据（这种处理方式是协议设计的原因，即屏只是用来显示而不处理数据，操作每个按键都会下发数据，Android不关注具体每个键的作用，等到单片机接收并应答后才会响应），也就是存在数据丢失的情况。具体丢失哪些数据，在操作步骤的哪个节点上丢失无从得知。</p>
+<h4 id="工作过程"><a href="#工作过程" class="headerlink" title="工作过程"></a>工作过程</h4><p>原理很简单，就是在通信双方的链路中插入计算机，计算机将数据转发的同时，进行数据的显示与记录，这样对于双方的通信的数据就会比较清楚。原理框图如下。</p>
+<p><img src="https://s3.ax1x.com/2021/01/19/s2wBHU.png" alt="s2wBHU.png"></p>
+<p>正常工作时，数据通过上面的链路通信，调试时使用下面的链路，也就是数据会经过计算机的转发，与此同时实现数据的显示、存储与分析。</p>
+<h4 id="软件实现"><a href="#软件实现" class="headerlink" title="软件实现"></a>软件实现</h4><p>主要包括2个库：tkinter用来做界面，serial用来操作串口。效果如下图。</p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/s2wrEF"><img src="https://s3.ax1x.com/2021/01/19/s2wrEF.png" alt="s2wrEF.png"></a></p>
+<p>可以对串口进行选择，对串口参数进行配置。</p>
+<p>最后两个按键可以实现清屏处理与数据保存，数据保存按照时间命名为txt文件，方便查看与处理。</p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/s2waj0"><img src="https://s3.ax1x.com/2021/01/19/s2waj0.png" alt="s2waj0.png"></a></p>
+<p>文件中的保存方式就是软件中数据的显示方式，如下。</p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/s2wwuV"><img src="https://s3.ax1x.com/2021/01/19/s2wwuV.png" alt="s2wwuV.png"></a></p>
+<h4 id="结尾"><a href="#结尾" class="headerlink" title="结尾"></a>结尾</h4><p>这个小软件发挥了很大的作用，除了上面提到的数据丢失问题，还发现了其它一些不容易出现的问题，这样就可以更有针对性的优化软件。</p>
+<p>一个需要注意的问题是数据显示。因为有两个串口可能会同时接收到数据，那么显示数据时可能就会有冲突。所以需要一个<code>锁</code>来保证数据写入的正常，待数据写入完成后，释放锁。</p>
+<p>再说一句，这个项目中单片机软件的实现架构不太好，uart数据接收方式也有问题，另外一些操作相当费时。比如键盘上的LCD屏，调试的时候发现，竟然需要100多毫秒。而上面所说的数据重发数据间隔并没有那么长，基本上也就50ms左右。某些情况下，两帧数据会连续发送，其发送间隔很小，如果在处理接收的数据过程中存在比较费时的操作，那么下次的是数据可能就会无法正常接收，也就是会造成数据丢失。究其根本，还是单片机接收Android下发的数据存在比较大的问题，这个项目会在另一篇中详细说明。</p>
 
     </div>
 
@@ -234,7 +238,7 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/%E5%B7%A5%E5%85%B7-python-%E5%9B%BE%E5%BD%A2%E6%98%BE%E7%A4%BA/" rel="tag"># 工具 python 图形显示</a>
+              <a href="/tags/%E5%B7%A5%E5%85%B7-python/" rel="tag"># 工具 python</a>
           </div>
 
         
@@ -243,13 +247,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2021/01/17/hexo%E5%AE%89%E8%A3%85/" rel="prev" title="hexo安装">
-      <i class="fa fa-chevron-left"></i> hexo安装
+    <a href="/2021/01/18/%E6%95%B0%E6%8D%AE%E5%9B%BE%E5%BD%A2%E6%98%BE%E7%A4%BA%E5%B0%8F%E5%B7%A5%E5%85%B7/" rel="prev" title="数据图形显示小工具">
+      <i class="fa fa-chevron-left"></i> 数据图形显示小工具
     </a></div>
-      <div class="post-nav-item">
-    <a href="/2021/01/19/%E4%B8%B2%E5%8F%A3%E6%95%B0%E6%8D%AE%E8%BD%AC%E5%8F%91%E4%B8%8E%E7%9B%91%E6%8E%A7/" rel="next" title="串口数据转发与监控">
-      串口数据转发与监控 <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -308,7 +309,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E6%9D%A5%E5%8E%86"><span class="nav-number">1.</span> <span class="nav-text">1 来历</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%8E%9F%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text">2 原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E5%B7%A5%E5%86%B5"><span class="nav-number">3.</span> <span class="nav-text">3 工况</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E7%BB%93%E5%B0%BE"><span class="nav-number">4.</span> <span class="nav-text">4 结尾</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%B5%B7%E5%9B%A0%E8%AF%B4%E6%98%8E"><span class="nav-number">1.</span> <span class="nav-text">起因说明</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B7%A5%E4%BD%9C%E8%BF%87%E7%A8%8B"><span class="nav-number">2.</span> <span class="nav-text">工作过程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BD%AF%E4%BB%B6%E5%AE%9E%E7%8E%B0"><span class="nav-number">3.</span> <span class="nav-text">软件实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BB%93%E5%B0%BE"><span class="nav-number">4.</span> <span class="nav-text">结尾</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
