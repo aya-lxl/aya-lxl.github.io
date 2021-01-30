@@ -155,6 +155,109 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://aya-lxl.github.io/2021/01/30/STM32%E4%B9%8BADC%E7%94%9F%E6%88%90%E6%B3%A2%E5%BD%A2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="lxl">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="直到海角天涯">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/01/30/STM32%E4%B9%8BADC%E7%94%9F%E6%88%90%E6%B3%A2%E5%BD%A2/" class="post-title-link" itemprop="url">STM32之ADC生成波形</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-01-30 21:07:24 / 修改时间：21:08:11" itemprop="dateCreated datePublished" datetime="2021-01-30T21:07:24+08:00">2021-01-30</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8D%95%E7%89%87%E6%9C%BA/" itemprop="url" rel="index"><span itemprop="name">单片机</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>平台：STM32F103VET6</p>
+<h3 id="1、三角波"><a href="#1、三角波" class="headerlink" title="1、三角波"></a>1、三角波</h3><p>使用STM32F103 DAC输出三角波，定时器2触发。</p>
+<p>PA5,也就是通道2,输出波形：</p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/ykU1eO"><img src="https://s3.ax1x.com/2021/01/30/ykU1eO.png" alt="ykU1eO.png"></a></p>
+<p>调整幅值为2047后：</p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/ykUYYd"><img src="https://s3.ax1x.com/2021/01/30/ykUYYd.jpg" alt="ykUYYd.jpg"></a></p>
+<p>在增加1V的DC偏移</p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/ykUUSI"><img src="https://s3.ax1x.com/2021/01/30/ykUUSI.jpg" alt="ykUUSI.jpg"></a></p>
+<p>通道1也可以，但是因为硬件原因，波形不正确。</p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/ykUwOf"><img src="https://s3.ax1x.com/2021/01/30/ykUwOf.png" alt="ykUwOf.png"></a></p>
+<p>其输出波形：</p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/ykUBm8"><img src="https://s3.ax1x.com/2021/01/30/ykUBm8.png" alt="ykUBm8.png"></a></p>
+<h3 id="2、代码"><a href="#2、代码" class="headerlink" title="2、代码"></a>2、代码</h3><p><strong>(1) DAC配置</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">dac1_init_triangle</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    GPIO_InitTypeDef GPIO_InitStructure;</span><br><span class="line">    DAC_InitTypeDef DAC_InitType;</span><br><span class="line"></span><br><span class="line">    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);</span><br><span class="line">    RCC_APB1PeriphClockCmd(RCC_APB1Periph_DAC, ENABLE);</span><br><span class="line"></span><br><span class="line">    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5;</span><br><span class="line">    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AIN;</span><br><span class="line">    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;</span><br><span class="line">    GPIO_Init(GPIOA, &amp;GPIO_InitStructure);</span><br><span class="line">    GPIO_SetBits(GPIOA, GPIO_Pin_5);</span><br><span class="line"></span><br><span class="line">    DAC_InitType.DAC_Trigger = DAC_Trigger_T2_TRGO;<span class="comment">//TIM2 TRGO事件</span></span><br><span class="line">    DAC_InitType.DAC_WaveGeneration =DAC_WaveGeneration_Triangle;</span><br><span class="line">    DAC_InitType.DAC_LFSRUnmask_TriangleAmplitude = DAC_TriangleAmplitude_2047;</span><br><span class="line">    DAC_InitType.DAC_OutputBuffer = DAC_OutputBuffer_Disable;</span><br><span class="line">    DAC_Init(DAC_Channel_2, &amp;DAC_InitType);</span><br><span class="line"></span><br><span class="line">    DAC_SetChannel1Data(DAC_Align_12b_R, <span class="number">0</span>);</span><br><span class="line">    DAC_SoftwareTriggerCmd(DAC_Channel_2,ENABLE);</span><br><span class="line">    DAC_Cmd(DAC_Channel_2, ENABLE);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">设置输出电压</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">dac1_set_vol</span><span class="params">(<span class="keyword">float</span> vol)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">uint16_t</span> data;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(vol &gt; <span class="number">3.3</span>)</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">    data = <span class="number">4096</span> * vol / <span class="number">3.3</span>;</span><br><span class="line">    DAC_SetChannel2Data(DAC_Align_12b_R, data); <span class="comment">//12位右对齐数据格式设置DAC值</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>(2)tim2配置</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">tim2_init</span><span class="params">(u16 arr,u16 psc)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;</span><br><span class="line">	</span><br><span class="line">	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2,ENABLE);</span><br><span class="line">	TIM_DeInit(TIM2);</span><br><span class="line">	TIM_InternalClockConfig(TIM2);</span><br><span class="line">	TIM_TimeBaseStructure.TIM_Prescaler = psc<span class="number">-1</span>;	 <span class="comment">//72MHz分频系数</span></span><br><span class="line">	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;</span><br><span class="line">	TIM_TimeBaseStructure.TIM_Period = arr<span class="number">-1</span>;</span><br><span class="line">	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;</span><br><span class="line"></span><br><span class="line">	TIM_TimeBaseInit(TIM2,&amp;TIM_TimeBaseStructure);</span><br><span class="line">	TIM_ClearFlag(TIM2, TIM_FLAG_Update);</span><br><span class="line">	TIM_SelectOutputTrigger(TIM2,TIM_TRGOSource_Update);<span class="comment">//更新事件被选为触发输入(TRGO)</span></span><br><span class="line">	TIM_ARRPreloadConfig(TIM2, ENABLE);</span><br><span class="line">	TIM_Cmd(TIM2,ENABLE);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="3、原理"><a href="#3、原理" class="headerlink" title="3、原理"></a>3、原理</h3><p>内部的三角波计数器每次触发事件之后3个APB1时钟周期后累加1。计数器的值与DAC_DHRx寄存器的数值相加并丢弃溢出位后写入DAC_DORx寄存器。在传入DAC_DORx寄存器的数值小于MAMP[3:0]位定义的最大幅度时，三角波计数器逐步累加。一旦达到设置的最大幅度，则计数器开始递减，达到0后再开始累加，周而复始。  </p>
+<p>上面这一段摘自<code>《STM32F10xxx参考手册  》</code>，在这里触发事件就是定时器2的TIM_TRGOSource_Update更新事件。所以，更改定时器的PSC与ARR即可改变三角波的周期。比如下图,PSC=6,ARR=1000。</p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/ykUykQ"><img src="https://s3.ax1x.com/2021/01/30/ykUykQ.jpg" alt="ykUykQ.jpg"></a></p>
+<p>另一方面，三角波形的周期还与三角波的幅值有关，比如在上述定时器参数下，幅值变由DAC_TriangleAmplitude_2047变为DAC_TriangleAmplitude_1023，则波形变为：</p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/ykUcfs"><img src="https://s3.ax1x.com/2021/01/30/ykUcfs.jpg" alt="ykUcfs.jpg"></a></p>
+<p>三角波的周期可以这样计算</p>
+<ul>
+<li><p>首先计算定时器触发频率：72M/(PSC+1)/ARR</p>
+<p>这里PSC=5,ARR=1000,72M/(5+1)/1000=12K,那么周期就是1/12K.</p>
+</li>
+<li><p>三角波周期</p>
+<p>DAC_TriangleAmplitude_2047时，则周期为2047*(1/12K)=170.6ms</p>
+<p>DAC_TriangleAmplitude_1023时，则周期为1023*(1/12K)=85ms</p>
+</li>
+</ul>
+<h3 id="4、噪声"><a href="#4、噪声" class="headerlink" title="4、噪声"></a>4、噪声</h3><p>  DAC沟通过那样可以产生噪声，只需要将配置中改为</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">DAC_InitType.DAC_WaveGeneration = DAC_WaveGeneration_Noise;</span><br><span class="line">DAC_InitType.DAC_LFSRUnmask_TriangleAmplitude=DAC_LFSRUnmask_Bits11_0;</span><br></pre></td></tr></table></figure>
+<p>波形如下图：</p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/ykUW60"><img src="https://s3.ax1x.com/2021/01/30/ykUW60.jpg" alt="ykUW60.jpg"></a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://aya-lxl.github.io/2021/01/19/%E4%B8%B2%E5%8F%A3%E6%95%B0%E6%8D%AE%E8%BD%AC%E5%8F%91%E4%B8%8E%E7%9B%91%E6%8E%A7/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -571,20 +674,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-count">5</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-count">3</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-count">4</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
