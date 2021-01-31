@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"aya-lxl.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="STM32F103窗口看门狗（Window watchdog） 1、结构框图  从RCC产生的时钟经过4096分频后进入WDG预分频器  WWDG_CR寄存器之T[6:0]是看门狗计数器值，预分频器每产生一个时钟减一。当从0x40变为0x3F时产生看门狗复位（T6位跳变到0）。  WWDG_CFR寄存器之W[6:0]是窗口值，用来与递减计数器T进行比较，W[6:0]应该小于0x80。当计数器T的值">
+<meta property="og:type" content="article">
+<meta property="og:title" content="wwdg">
+<meta property="og:url" content="https://aya-lxl.github.io/2021/02/01/wwdg/index.html">
+<meta property="og:site_name" content="直到海角天涯">
+<meta property="og:description" content="STM32F103窗口看门狗（Window watchdog） 1、结构框图  从RCC产生的时钟经过4096分频后进入WDG预分频器  WWDG_CR寄存器之T[6:0]是看门狗计数器值，预分频器每产生一个时钟减一。当从0x40变为0x3F时产生看门狗复位（T6位跳变到0）。  WWDG_CFR寄存器之W[6:0]是窗口值，用来与递减计数器T进行比较，W[6:0]应该小于0x80。当计数器T的值">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://s3.ax1x.com/2021/02/01/yV0yT0.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/02/01/yV0ckV.png">
+<meta property="og:image" content="https://s3.ax1x.com/2021/02/01/yV0gYT.png">
+<meta property="article:published_time" content="2021-01-31T23:41:47.000Z">
+<meta property="article:modified_time" content="2021-01-31T23:47:20.303Z">
+<meta property="article:author" content="lxl">
+<meta property="article:tag" content="STM32">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://s3.ax1x.com/2021/02/01/yV0yT0.png">
+
+<link rel="canonical" href="https://aya-lxl.github.io/2021/02/01/wwdg/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>wwdg | 直到海角天涯</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">直到海角天涯</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://aya-lxl.github.io/2021/02/01/wwdg/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="lxl">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="直到海角天涯">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          wwdg
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-02-01 07:41:47 / 修改时间：07:47:20" itemprop="dateCreated datePublished" datetime="2021-02-01T07:41:47+08:00">2021-02-01</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8D%95%E7%89%87%E6%9C%BA/" itemprop="url" rel="index"><span itemprop="name">单片机</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>STM32F103窗口看门狗（Window watchdog）</p>
+<h4 id="1、结构框图"><a href="#1、结构框图" class="headerlink" title="1、结构框图"></a>1、结构框图</h4><p><a target="_blank" rel="noopener" href="https://imgchr.com/i/yV0yT0"><img src="https://s3.ax1x.com/2021/02/01/yV0yT0.png" alt="yV0yT0.png"></a></p>
+<ul>
+<li><p>从RCC产生的时钟经过4096分频后进入WDG预分频器</p>
+</li>
+<li><p>WWDG_CR寄存器之T[6:0]是看门狗计数器值，预分频器每产生一个时钟减一。当从0x40变为0x3F时产生看门狗复位（T6位跳变到0）。</p>
+</li>
+<li><p>WWDG_CFR寄存器之W[6:0]是窗口值，用来与递减计数器T进行比较，W[6:0]应该小于0x80。当计数器T的值小于W时才可以重新设置WWDG_CR的T值，也就是<code>喂狗</code>，如下图所示：</p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/yV0ckV"><img src="https://s3.ax1x.com/2021/02/01/yV0ckV.png" alt="yV0ckV.png"></a></p>
+<p>也就是说<code>喂狗</code>需要在0X3F与W[6:0]这个<code>窗口</code>之间，过早过晚都会引起复位.</p>
+<p>另外也可以看出，T[6:0]设置区间为0x40~0x7f.</p>
+</li>
+<li><p>WWDG_CFR之EWI位：提前唤醒中断 (Early wakeup interrupt) 此位若置’1’，则当计数器值达到40h，即产生中断。可以在中断中<code>喂狗</code>。</p>
+</li>
+<li><p>WWDG_CFR之WDGTB位：将预分频器的时钟再次分频，该位位0-3时分别分频1、2、4、8。所以可以得到如下的计算时间公式：</p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/yV0gYT"><img src="https://s3.ax1x.com/2021/02/01/yV0gYT.png" alt="yV0gYT.png"></a></p>
+</li>
+<li><p>其它还包括使能位即状态位等。</p>
+</li>
+</ul>
+<h4 id="2、代码"><a href="#2、代码" class="headerlink" title="2、代码"></a>2、代码</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&quot;stm32f10x_wwdg.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">wwdg_init</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    NVIC_InitTypeDef NVIC_InitStructure;</span><br><span class="line"></span><br><span class="line">    NVIC_InitStructure.NVIC_IRQChannel = WWDG_IRQn;</span><br><span class="line">    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = <span class="number">0</span>;</span><br><span class="line">    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;</span><br><span class="line">    NVIC_Init(&amp;NVIC_InitStructure);</span><br><span class="line"></span><br><span class="line">    RCC_APB1PeriphClockCmd(RCC_APB1Periph_WWDG, ENABLE);</span><br><span class="line"></span><br><span class="line">    WWDG_SetPrescaler(WWDG_Prescaler_8);</span><br><span class="line">    WWDG_SetWindowValue(<span class="number">0x7f</span>);</span><br><span class="line">    WWDG_SetCounter(<span class="number">0x7e</span>);</span><br><span class="line"></span><br><span class="line">    WWDG_ClearFlag();</span><br><span class="line">    WWDG_Enable(<span class="number">0x7e</span>);</span><br><span class="line">    WWDG_EnableIT();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">WWDG_IRQHandler</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(WWDG_GetFlagStatus())</span><br><span class="line">    &#123;</span><br><span class="line">        WWDG_ClearFlag();</span><br><span class="line">        WWDG_SetCounter(<span class="number">0x7e</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>配置过程还是比较简单的。</p>
+<h4 id="3、问题"><a href="#3、问题" class="headerlink" title="3、问题"></a>3、问题</h4><p>但是引出另外一个问题，即<code>喂狗</code>在中断中处理是否合适？</p>
+<p>比如在一篇文章中，作者认为（原文参考末尾链接）：</p>
+<p><code>窗口看门狗WWDG----系统内部的故障探测器，时钟与系统相同。如果系统时钟不走了，这个狗也就失去了作用了，主要用于监视软件错误。</code></p>
+<p><code>WWDG的中断不是用于日常喂狗的，如果用于日常喂狗动作，那WWDG的相对于IWDG，功能也就没什么特别了。WWDG的中断是给程序员最后一次喂狗的机会，一般进入这个中断时，表示你在其他地方安排的喂狗操不能凑效了，而发生这种现象时，肯定是系统有问题了，或者程序有Bug或者干扰，在这种情况下，这个中断时为了让你的程序在发生真正的看门狗复位前，有一个紧急处理的机会，如保存重要数据，或者系统刹车，说白了，就是让CPU写“遗嘱”；简单的在WWDG中断中喂狗，既没有发挥WWDG相对于IWDG的优势，又因为在中断中喂狗，而为以后的产品留下了隐患。</code></p>
+<p>如果不在中断中处理，那么因为时间窗口的原因，处理起来可能会比较麻烦，就是需要每过一段时间进行一次<code>喂狗</code>，时间如何把控？</p>
+<h4 id="4、参考"><a href="#4、参考" class="headerlink" title="4、参考"></a>4、参考</h4><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/u012351051/article/details/50385074?utm_source=copy">https://blog.csdn.net/u012351051/article/details/50385074?utm_source=copy</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/STM32/" rel="tag"># STM32</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/01/30/STM32%E4%B9%8BADC%E7%94%9F%E6%88%90%E6%B3%A2%E5%BD%A2/" rel="prev" title="STM32之ADC生成波形">
+      <i class="fa fa-chevron-left"></i> STM32之ADC生成波形
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#1%E3%80%81%E7%BB%93%E6%9E%84%E6%A1%86%E5%9B%BE"><span class="nav-number">1.</span> <span class="nav-text">1、结构框图</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2%E3%80%81%E4%BB%A3%E7%A0%81"><span class="nav-number">2.</span> <span class="nav-text">2、代码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3%E3%80%81%E9%97%AE%E9%A2%98"><span class="nav-number">3.</span> <span class="nav-text">3、问题</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4%E3%80%81%E5%8F%82%E8%80%83"><span class="nav-number">4.</span> <span class="nav-text">4、参考</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">lxl</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">6</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lxl</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
