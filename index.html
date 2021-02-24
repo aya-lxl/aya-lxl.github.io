@@ -155,6 +155,113 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://aya-lxl.github.io/2021/02/24/%E5%8D%95%E7%89%87%E6%9C%BAPWM%E6%92%AD%E6%94%BE%E9%9F%B3%E4%B9%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="lxl">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="直到海角天涯">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/02/24/%E5%8D%95%E7%89%87%E6%9C%BAPWM%E6%92%AD%E6%94%BE%E9%9F%B3%E4%B9%90/" class="post-title-link" itemprop="url">单片机PWM播放音乐</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-02-24 11:37:00 / 修改时间：11:37:53" itemprop="dateCreated datePublished" datetime="2021-02-24T11:37:00+08:00">2021-02-24</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8D%95%E7%89%87%E6%9C%BA/" itemprop="url" rel="index"><span itemprop="name">单片机</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="使用单片机PWM播放音乐"><a href="#使用单片机PWM播放音乐" class="headerlink" title="使用单片机PWM播放音乐"></a>使用单片机PWM播放音乐</h2><p>一个偶然的机会，看到一篇文章（即参考中的第一项），觉得挺有意思，想搞一下。而且最近一直在搞比例调节阀的事情，就是使用到了pwm。</p>
+<h3 id="1、原理"><a href="#1、原理" class="headerlink" title="1、原理"></a>1、原理</h3><p><strong>（1）音调</strong></p>
+<p>每一个音调都有一个固定的频率，比如下面这个图：</p>
+<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/yokRSA"><img src="https://s3.ax1x.com/2021/02/21/yokRSA.jpg" alt="yokRSA.jpg"></a></p>
+<p>只要使PWM的频率与相应的音调频率相同即可，当需要改变音调时，修改pwm周期即可。</p>
+<p><strong>（2）音长</strong></p>
+<p>四分之一音符、二分之一音符、全音符，通过延时简单处理，这样理解起来比较方便。</p>
+<p><strong>（3）音量</strong></p>
+<p>控制PWM的输出脉宽。这个值越大，发出的声音越大。当然要想达到理想的效果，还需要功放的帮助。</p>
+<h3 id="2、实现"><a href="#2、实现" class="headerlink" title="2、实现"></a>2、实现</h3><p>单片机使用lpc2378，pwm输出后直接驱动喇叭发声。另一方面，实际的硬件接口输出电平为5V，喇叭使用12V才比较正常，所以声音输出比较小。</p>
+<p>另一个重点就是音乐文件的生成。这个需要查看其它的资料。这里只是直接使用的网上的数据，该数据包含两部分：频率部分、时延部分，分别表示音调与音长。在程序运行时，先设置pwm为某一频率，之后延时对应的时间，然后重新开始下一个频率与延时。</p>
+<p>如何查看简谱，可以参考网上的其它一些资料。下面的说明是网上的资料（<code>侵权删</code>）。</p>
+<hr>
+<p><a target="_blank" rel="noopener" href="https://bbs.huaweicloud.com/blogs/203985"><code>简谱说明</code></a></p>
+<p><img src="https://s3.ax1x.com/2021/02/21/yokhOP.png" alt="yokhOP.png"></p>
+<ol>
+<li><p>左上角的1=C是表示调式（可以不用关心），1是唱名，C是音名，1=C是正调（就是常规的对应关系: 1-C，2-D, 3-E, 4-F, 5-G, 6-A, 7-B）；</p>
+</li>
+<li><p>左上角的 4/4 是四四拍，是指 四分音符为一拍， 每小节有四拍；</p>
+</li>
+<li><p>下面谱子上的竖线就是每个小节分隔符，和4/4对应；</p>
+</li>
+<li><p>“跑得快”上面5后面的横线表示延时一拍；</p>
+</li>
+<li><p>“一直没有眼睛”一句，5后面的点表示顺延半拍，一条下划线表示二分之一时间，两条下划线表示四分之一时间；</p>
+</li>
+</ol>
+<h3 id="3、其它"><a href="#3、其它" class="headerlink" title="3、其它"></a>3、其它</h3><p>还有另外一个想法，即奈奎斯特定理。对音频采样，只要符合该定理，那么就可以完整地恢复原始的音频。该方法似乎更简单，并不涉及到哪个频率是多少，音长是多少，却可以恢复原始的声音。比如电话，通过某一频率采样，电话的另一端就可以恢复说话人的声音。当然这里面还涉及到采样精度问题。</p>
+<p>很自然的产生另外一个想法，是否可以通过频率合成的方式来实现声音的合成的？每一段音乐或者声音，包含不同的频率，每个频率又具有不同的幅度，应该需要一个巨大的运算量。</p>
+<hr>
+<h4 id="主要参考"><a href="#主要参考" class="headerlink" title="主要参考"></a>主要参考</h4><p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/34358127">https://zhuanlan.zhihu.com/p/34358127</a></p>
+<p><a target="_blank" rel="noopener" href="https://cloud.tencent.com/developer/article/1758279">https://cloud.tencent.com/developer/article/1758279</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/devymex/p/3389620.html">https://www.cnblogs.com/devymex/p/3389620.html</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/759222924lele/p/9771260.html">https://www.cnblogs.com/759222924lele/p/9771260.html</a></p>
+<p><a target="_blank" rel="noopener" href="https://mbb.eet-china.com/forum/topic/71081_1_1.html">https://mbb.eet-china.com/forum/topic/71081_1_1.html</a></p>
+<p><a target="_blank" rel="noopener" href="https://bbs.huaweicloud.com/blogs/203985">https://bbs.huaweicloud.com/blogs/203985</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.huaweicloud.com/articles/adb4c1f99f28447b35a3e39a209b86a5.html">https://www.huaweicloud.com/articles/adb4c1f99f28447b35a3e39a209b86a5.html</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.technics.com/cn/high-res-audio/what-is-high-resolution-audio.html">https://www.technics.com/cn/high-res-audio/what-is-high-resolution-audio.html</a></p>
+<p><a target="_blank" rel="noopener" href="https://cloud.tencent.com/developer/article/1656128">https://cloud.tencent.com/developer/article/1656128</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.zhihu.com/question/51379187">https://www.zhihu.com/question/51379187</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://aya-lxl.github.io/2021/02/04/%E6%A0%85%E6%9E%81%E7%94%B5%E9%98%BB/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -853,7 +960,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">7</span>
+          <span class="site-state-item-count">8</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -866,7 +973,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-count">6</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
