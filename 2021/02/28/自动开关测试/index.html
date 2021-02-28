@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"aya-lxl.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="自动开关测试软件写差不多了，就需要机器上完整地运行、测试，检查其中可能存在的错误，长时间运行的可靠性等。本篇的主题是自动开关测试，通过模拟开关变化，使机器反复地运行、停止。 项目中机器的启动与停止有多种方式，但无论如何均需要打开、关闭动作，这里的测试就是针对开关的模拟而设计的。 其中一种机器的开关方式：打开开关，等待一段时间，关闭，等待一段时间，再打开，如此循环。 1234567891011121">
+<meta property="og:type" content="article">
+<meta property="og:title" content="自动开关测试">
+<meta property="og:url" content="https://aya-lxl.github.io/2021/02/28/%E8%87%AA%E5%8A%A8%E5%BC%80%E5%85%B3%E6%B5%8B%E8%AF%95/index.html">
+<meta property="og:site_name" content="直到海角天涯">
+<meta property="og:description" content="自动开关测试软件写差不多了，就需要机器上完整地运行、测试，检查其中可能存在的错误，长时间运行的可靠性等。本篇的主题是自动开关测试，通过模拟开关变化，使机器反复地运行、停止。 项目中机器的启动与停止有多种方式，但无论如何均需要打开、关闭动作，这里的测试就是针对开关的模拟而设计的。 其中一种机器的开关方式：打开开关，等待一段时间，关闭，等待一段时间，再打开，如此循环。 1234567891011121">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-02-28T02:52:25.000Z">
+<meta property="article:modified_time" content="2021-02-28T03:04:58.807Z">
+<meta property="article:author" content="lxl">
+<meta property="article:tag" content="测试">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://aya-lxl.github.io/2021/02/28/%E8%87%AA%E5%8A%A8%E5%BC%80%E5%85%B3%E6%B5%8B%E8%AF%95/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>自动开关测试 | 直到海角天涯</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">直到海角天涯</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://aya-lxl.github.io/2021/02/28/%E8%87%AA%E5%8A%A8%E5%BC%80%E5%85%B3%E6%B5%8B%E8%AF%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="lxl">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="直到海角天涯">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          自动开关测试
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-02-28 10:52:25 / 修改时间：11:04:58" itemprop="dateCreated datePublished" datetime="2021-02-28T10:52:25+08:00">2021-02-28</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E5%85%B7/" itemprop="url" rel="index"><span itemprop="name">工具</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h4 id="自动开关测试"><a href="#自动开关测试" class="headerlink" title="自动开关测试"></a>自动开关测试</h4><p>软件写差不多了，就需要机器上完整地运行、测试，检查其中可能存在的错误，长时间运行的可靠性等。本篇的主题是自动开关测试，通过模拟开关变化，使机器反复地运行、停止。</p>
+<p>项目中机器的启动与停止有多种方式，但无论如何均需要打开、关闭动作，这里的测试就是针对开关的模拟而设计的。</p>
+<p>其中一种机器的开关方式：打开开关，等待一段时间，关闭，等待一段时间，再打开，如此循环。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">unsigned</span> <span class="keyword">int</span> randseed;</span><br><span class="line"><span class="function"><span class="keyword">unsigned</span> <span class="keyword">int</span> <span class="title">curl_rand</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">unsigned</span> <span class="keyword">int</span> r;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/* 返回一个无符号32位整型的伪随机数. */</span></span><br><span class="line">    r = randseed = randseed * <span class="number">1103515245</span> + <span class="number">12345</span>;</span><br><span class="line">    <span class="keyword">return</span> (r &lt;&lt; <span class="number">16</span>) | ((r &gt;&gt; <span class="number">16</span>) &amp; <span class="number">0xFFFF</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">static</span> uint32 <span class="title">random</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> curl_rand()%<span class="number">2000</span> + <span class="number">30</span>; <span class="comment">//避免数据太小</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">task_on_off</span><span class="params">(<span class="keyword">void</span>* pvData)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">uint16_t</span> sec;</span><br><span class="line">	</span><br><span class="line">    pvData = pvData;</span><br><span class="line">    randseed =seconds_cal();<span class="comment">//用时间产生一个初始值</span></span><br><span class="line">    </span><br><span class="line">    OSTimeDlyHMSM(<span class="number">0</span>,<span class="number">0</span>,<span class="number">10</span>,<span class="number">0</span>);</span><br><span class="line">    <span class="keyword">while</span>(<span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        sec=random()%<span class="number">120</span>+<span class="number">10</span>;</span><br><span class="line">        OSTimeDlyHMSM(<span class="number">0</span>,sec/<span class="number">60</span>,sec%<span class="number">60</span>,<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">        SWITCH_OPEN(<span class="number">0</span>);</span><br><span class="line">        </span><br><span class="line">        sec=random()%(<span class="number">4</span>*<span class="number">60</span>)+<span class="number">10</span>;</span><br><span class="line">        OSTimeDlyHMSM(<span class="number">0</span>,sec/<span class="number">60</span>,sec%<span class="number">60</span>,<span class="number">0</span>);</span><br><span class="line">	 </span><br><span class="line">        SWITCH_CLOSE(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>打开或者关闭的时间是一个伪随机数，并且对随机数的大小进行了限制，避免过长或过短时间的开或者关。</p>
+<p>还有一种机器，是通过自复位按钮来确定开关状态的，此时就是通过脉冲实现的。模拟代码如下。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">task_lpg_button</span><span class="params">(<span class="keyword">void</span>* pvData)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">uint16_t</span> sec;</span><br><span class="line">	</span><br><span class="line">    pvData = pvData;</span><br><span class="line">    randseed =seconds_cal();</span><br><span class="line">    </span><br><span class="line">    OSTimeDlyHMSM(<span class="number">0</span>,<span class="number">0</span>,<span class="number">10</span>,<span class="number">0</span>);</span><br><span class="line">    <span class="keyword">while</span>(<span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        sec=random()%<span class="number">120</span>+<span class="number">10</span>;</span><br><span class="line">        OSTimeDlyHMSM(<span class="number">0</span>,sec/<span class="number">60</span>,sec%<span class="number">60</span>,<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">        SWITCH_OPEN(<span class="number">0</span>);</span><br><span class="line">        OSTimeDlyHMSM(<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">300</span>);</span><br><span class="line">        SWITCH_CLOSE(<span class="number">0</span>);</span><br><span class="line">        </span><br><span class="line">        sec=random()%(<span class="number">4</span>*<span class="number">60</span>)+<span class="number">10</span>;</span><br><span class="line">        OSTimeDlyHMSM(<span class="number">0</span>,sec/<span class="number">60</span>,sec%<span class="number">60</span>,<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">        SWITCH_OPEN(<span class="number">1</span>);</span><br><span class="line">        OSTimeDlyHMSM(<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">300</span>);</span><br><span class="line">        SWITCH_CLOSE(<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上述代码模拟脉冲时延时是300ms，实际的按钮脉冲时间不会这么长，主要是因为模拟软件运行所使用的板子的问题。</p>
+<h4 id="其它"><a href="#其它" class="headerlink" title="其它"></a>其它</h4><p>上述原理与实现都很简单，重点在于这样一种思想：工欲善其事，必先利其器。如果人去操作测试，效率不高，并且也很费时间，如果期间还在做其它事情，就会有忘记的可能，使用这些小工具就会避免这些问题。</p>
+<p>但是另一方面，模拟测试也只会测试一方面的问题，如果想要全面的自动测试，还需要做大量的工作。</p>
+<p>实际工作中随着项目的进行，还写了其它一些小工具，比如通信协议的校验值计算、数据转发与监控等等。这些工具的使用，对于发现问题、解决问题起到了很大的帮助。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%B5%8B%E8%AF%95/" rel="tag"># 测试</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/02/24/%E5%8D%95%E7%89%87%E6%9C%BAPWM%E6%92%AD%E6%94%BE%E9%9F%B3%E4%B9%90/" rel="prev" title="单片机PWM播放音乐">
+      <i class="fa fa-chevron-left"></i> 单片机PWM播放音乐
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%87%AA%E5%8A%A8%E5%BC%80%E5%85%B3%E6%B5%8B%E8%AF%95"><span class="nav-number">1.</span> <span class="nav-text">自动开关测试</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%B6%E5%AE%83"><span class="nav-number">2.</span> <span class="nav-text">其它</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">lxl</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">9</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lxl</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
