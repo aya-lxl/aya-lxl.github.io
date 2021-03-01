@@ -155,6 +155,134 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://aya-lxl.github.io/2021/02/28/%E7%BB%84%E5%90%88%E5%8A%9F%E8%83%BD%E6%9C%BA%E5%99%A8%E8%BD%AF%E4%BB%B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="lxl">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="直到海角天涯">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/02/28/%E7%BB%84%E5%90%88%E5%8A%9F%E8%83%BD%E6%9C%BA%E5%99%A8%E8%BD%AF%E4%BB%B6/" class="post-title-link" itemprop="url">组合功能机器软件</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-02-28 16:57:51" itemprop="dateCreated datePublished" datetime="2021-02-28T16:57:51+08:00">2021-02-28</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-03-01 11:16:34" itemprop="dateModified" datetime="2021-03-01T11:16:34+08:00">2021-03-01</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8D%95%E7%89%87%E6%9C%BA/" itemprop="url" rel="index"><span itemprop="name">单片机</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h4 id="0、简述"><a href="#0、简述" class="headerlink" title="0、简述"></a>0、简述</h4><p>单片机使用LPC1115，采用ucos-ii。</p>
+<p>程序主要包括：1个主任务、3个功能任务，1个串口发送任务，1个状态指示灯任务，1个蜂鸣器任务。</p>
+<p>功能任务就是实现机器主要功能的任务，与机器的应用场合有很大的关系，所以在此不做过分详细的说明。每个功能可以实现开启、暂停、结束等命令，实现方式在下面说明。</p>
+<p>其它几个任务是辅助性的任务，为了更好地服务于机器功能的实现。</p>
+<h4 id="1、主任务"><a href="#1、主任务" class="headerlink" title="1、主任务"></a>1、主任务</h4><p>解析上位机的命令，并向任务发送命令。</p>
+<p>主任务结构伪代码</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">uint8_t</span> <span class="title">queue_func_insert</span><span class="params">(struct andrdata* andr)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">switch</span>(andr-&gt;cmd)</span><br><span class="line">    &#123;</span><br><span class="line">    <span class="keyword">case</span> FUNCTION_CMD_PUMP:</span><br><span class="line">    &#123;</span><br><span class="line">        OSQPost(q_pump, (<span class="keyword">void</span>*)(andr_pump_buf + pump_write));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">    <span class="comment">// ......</span></span><br><span class="line">    <span class="keyword">default</span>:</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">uint8_t</span> <span class="title">func_insert</span><span class="params">(struct andrdata* andr)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(queue_func_insert(andr) == <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">return</span> CMD_ERROR;</span><br><span class="line"></span><br><span class="line">    mbox_msg = OSMboxPend(from_task, OS_TICKS_PER_SEC / <span class="number">50</span>, &amp;err);</span><br><span class="line">    code = *mbox_msg;</span><br><span class="line">    <span class="comment">//根据返回结果处理</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> code;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">task_main_func</span><span class="params">(<span class="keyword">void</span>* pvData)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//......</span></span><br><span class="line">    <span class="keyword">while</span>(<span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//......</span></span><br><span class="line">        <span class="keyword">while</span>(<span class="number">1</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span>(andr_recv_queue.is_empty())</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            </span><br><span class="line">            andr = andr_queue_get(&amp;andr_recv_queue);</span><br><span class="line">            <span class="comment">//......</span></span><br><span class="line">            code = func_insert(andr);</span><br><span class="line">            <span class="comment">//......</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>主任务处理流程：</p>
+<p>①解析上位机命令</p>
+<p>②判断分析，如果合适，将命令发送至任务，等待任务应答。</p>
+<p>这样处理意在将各功能任务与上位机命令分离，各部分相互独立，减弱耦合。</p>
+<p>③主任务根据任务的应答进行后续处理。</p>
+<h4 id="2、功能任务"><a href="#2、功能任务" class="headerlink" title="2、功能任务"></a>2、功能任务</h4><p>功能任务用来实现各个具体的功能，虽然因任务的不同而有所变化，但处理流程基本一致。代码框架如下。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">该函数用来在功能运行过程中，接收上位机的一些命令，</span></span><br><span class="line"><span class="comment">诸如暂停、恢复、停止等，并且在暂停过程中还有超时处理。</span></span><br><span class="line"><span class="comment">若有其它控制需求，还可以比较方便地增加。</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="function"><span class="keyword">uint8_t</span> <span class="title">wait_mbox2task</span><span class="params">(<span class="keyword">uint8_t</span> index, <span class="keyword">uint16_t</span> timeout, <span class="keyword">uint8_t</span>* state, fun_call func, <span class="keyword">uint8_t</span> para)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    mbox_m = OSMboxPend(mbox, timeout, &amp;err);</span><br><span class="line">    <span class="keyword">if</span>(err != OS_NO_ERR)</span><br><span class="line">        <span class="keyword">return</span> FUNC_NONE;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">switch</span>(*mbox_m)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">case</span> FUNCTION_SUSPEND:</span><br><span class="line">        &#123;</span><br><span class="line">            OSMboxPost(md-&gt;mbox, &amp;md-&gt;msg);</span><br><span class="line">            <span class="keyword">while</span>(<span class="number">1</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                mbox_m = OSMboxPend(mbox, OS_TICKS_PER_SEC, &amp;err);</span><br><span class="line">                <span class="keyword">if</span>(err == OS_NO_ERR)</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="keyword">switch</span>(*mbox_m)</span><br><span class="line">                    &#123;</span><br><span class="line">                        <span class="keyword">case</span> FUNCTION_RESUME:</span><br><span class="line">                            md-&gt;msg = ALARM_CMD_OK;</span><br><span class="line">                            OSMboxPost(md-&gt;mbox, &amp;md-&gt;msg);</span><br><span class="line">                            <span class="keyword">return</span> FUNC_NONE;</span><br><span class="line"></span><br><span class="line">                        <span class="keyword">case</span> FUNC_STOP:</span><br><span class="line">                            <span class="comment">//...</span></span><br><span class="line">                            <span class="keyword">return</span> FUNC_STOP;</span><br><span class="line">                           </span><br><span class="line">                        <span class="keyword">default</span>:</span><br><span class="line">                            md-&gt;msg = ALARM_CMD_ERROR;</span><br><span class="line">                            OSMboxPost(md-&gt;mbox, &amp;md-&gt;msg);</span><br><span class="line">                            <span class="keyword">break</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                </span><br><span class="line">                <span class="keyword">if</span>(++suspend_time &gt;= SUSPEND_TIMEOUT)</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="keyword">return</span> FUNC_TIMEOUT;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">            </span><br><span class="line">        <span class="keyword">case</span> FUNC_STOP:</span><br><span class="line">            <span class="comment">//...</span></span><br><span class="line">            <span class="keyword">return</span> FUNC_STOP;</span><br><span class="line">            </span><br><span class="line">        <span class="keyword">default</span>:</span><br><span class="line">            <span class="comment">//...</span></span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> FUNC_NONE;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">task_pump</span><span class="params">(<span class="keyword">void</span>* pvData)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">while</span>(<span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//do something</span></span><br><span class="line">        andr = OSQPend(q_pump, OS_TICKS_PER_SEC, &amp;err);</span><br><span class="line">        <span class="keyword">if</span>(err != OS_NO_ERR)</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//andr参数检查</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">while</span>(<span class="number">1</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">//事件更新与处理</span></span><br><span class="line">            </span><br><span class="line">            ret = wait_mbox2task();</span><br><span class="line">            <span class="keyword">switch</span>(ret)</span><br><span class="line">            &#123;</span><br><span class="line">            <span class="keyword">case</span> FUNC_STOP:</span><br><span class="line">                <span class="comment">//..</span></span><br><span class="line">                <span class="keyword">goto</span> TASK_STOP;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">case</span> FUNC_TIMEOUT:</span><br><span class="line">                <span class="comment">//...</span></span><br><span class="line">                <span class="keyword">goto</span> TASK_STOP;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">default</span>:</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    TASK_STOP:</span><br><span class="line">        stop_task(flag_stop, flag_deal);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>在任务执行过程中，检查邮箱是否有数据到来：如果有，则分析具体动作，并执行之；否则就继续运行。命令包括几个方面：暂停（需要处理超时，不能长时间暂停）、恢复、停止（结束任务）等。</p>
+<p>因不同任务有不同的特点，所以各个任务会有各自的处理细节。比如某个任务工作时，仅仅需要计时即可，当达到定时要求后结束执行即可。而另一个任务功能则需要计量液体体积，同时检测水桶的水位，如果水位低于警报值，那么需要提醒用户或者报警；另一方面，向水桶中注水时则需要关注高水位警报。</p>
+<h4 id="3、辅助任务"><a href="#3、辅助任务" class="headerlink" title="3、辅助任务"></a>3、辅助任务</h4><h5 id="（1）串口发送任务"><a href="#（1）串口发送任务" class="headerlink" title="（1）串口发送任务"></a>（1）串口发送任务</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">task_uart_send</span><span class="params">(<span class="keyword">void</span>* pvData)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">while</span>(<span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        us = OSQPend(q_uart_send, <span class="number">0</span>, &amp;err);</span><br><span class="line">        <span class="keyword">if</span>(err != OS_NO_ERR)</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">switch</span>(us-&gt;com)</span><br><span class="line">        &#123;</span><br><span class="line">        <span class="keyword">case</span> UART_TO_RS232:</span><br><span class="line">            cmd_resp(us-&gt;UART_TO_RS485andr);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">case</span> UART_TO_RS485:</span><br><span class="line">            <span class="keyword">for</span>(i = <span class="number">0</span>; i &lt; UART_SEND_COUNT; i++)</span><br><span class="line">            &#123;</span><br><span class="line">                UARTSend(data, len);</span><br><span class="line">                OSSemPend(, , &amp;err);</span><br><span class="line">                <span class="keyword">if</span>(err != OS_NO_ERR)</span><br><span class="line">                    <span class="keyword">continue</span>;</span><br><span class="line">                <span class="comment">//do something else</span></span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">default</span>:</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">在其它位置调用下面的函数用以发送数据。</span></span><br><span class="line"><span class="comment">在本项目的实际应用中，不会有问题，但是这里仍不完善，有待改进。</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="function"><span class="keyword">uint8_t</span> <span class="title">mb_send_data</span><span class="params">(struct uart_send* us)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    send_buf[send_write] = *us;</span><br><span class="line">    OSQPost(q_uart_send, (<span class="keyword">void</span>*)(send_buf + send_write));</span><br><span class="line">    send_write = (send_write + <span class="number">1</span>) % Q_SIZE_SEND;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在程序的不同位置会向串口发送数据，其实只是发送到队列，在这个任务中处理这些待发送的数据。结合实际的应用需求，单片机UART0通过扩展芯片外接有两个设备：上位机、Modbus设备。上位机是rs232接口，Modbus设备是rs485接口，并且Modbus设备是从设备，所以在处理Modbus设备时需要处理数据应答与重发问题。</p>
+<p>可以这样简单理解。数据有多个源头，但是均需要从同一个串口发送，那么将他们放在一个队列中，在一个任务中将数据一个一个地取出并发送。在发送任务中，根据数据的不同目的设备，通过RS232或者RS485发送输出。</p>
+<p><img src="https://s3.ax1x.com/2021/02/28/691xg0.png" alt="691xg0.png"></p>
+<p>因为数据的接收也是从同一个uart进入，所以有可能丢失数据。比如在处理rs485设备时，rs232接口有数据过来，或者相反的情形。但是这种情况比较少，有几个原因：①上位机数据发送、重发数据有比较大的时间间隔；②从rs485发送数据时是报警、开启停止任务的时候。<code>但仍然存在数据丢失的可能性</code>,所以才会有数据重发机制。</p>
+<h5 id="（2）状态指示与蜂鸣器"><a href="#（2）状态指示与蜂鸣器" class="headerlink" title="（2）状态指示与蜂鸣器"></a>（2）状态指示与蜂鸣器</h5><p>这里的处理与数据发送任务比较类似，数据来源于多个位置，但是均需要从同一个UART输出，所以使用队列的处理方式，在任务中从队列中取数据处理。</p>
+<p>状态指示灯需要实现不同的效果，比如闪烁间隔、周期、次数等，各功能任务的状态显示均需通过状态指示任务处理，最后再通过串口发送任务发送数据。</p>
+<p>还有一个报警功能。所谓的报警，就是通过状态指示灯与蜂鸣器来提醒用户，并且上位机在查询状态时，也会检查到报警状态并提示。</p>
+<h5 id="（3）空闲任务"><a href="#（3）空闲任务" class="headerlink" title="（3）空闲任务"></a>（3）空闲任务</h5><p>电路板上有一个状态灯，将其放在空闲任务中，根据任务的不同状态，显示不同的状态。比如在空闲时为呼吸灯效果；有任务工作时，会是闪烁的状态；如果有报警，则以比较快的速度闪烁。</p>
+<p>其实在各功能运行时，大部分时间都是阻塞的状态，所以空闲任务会运行大部分时间，将状态灯放在这里进一步减轻了主要任务的处理压力。</p>
+<h5 id="（4）其它细节"><a href="#（4）其它细节" class="headerlink" title="（4）其它细节"></a>（4）其它细节</h5><ul>
+<li><p>任务优先级</p>
+<p>因为涉及到主任务与功能任务之间的通信以及串口数据发送问题，所以需要注意各个优先级的设置。在本项目中，功能任务优先级最高，主任务优先级次之，接着是串口发送任务，最后是蜂鸣器与状态指示任务。</p>
+</li>
+<li><p>同时工作的任务数量限制</p>
+<p>这主要是实际应用的需求才这样设计，在上述代码中未体现。</p>
+<p>一个问题是如何记录正在工作的任务及其数量？这里使用一个字节位的方式来处理。如果某个功能正在运行，那么将相应的位置1，完成后清0，统计1的数量就可以得到正在工作的任务的数量。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">uint8_t</span> <span class="title">get_bits_count</span><span class="params">(<span class="keyword">uint8_t</span> data)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">uint8_t</span> i;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span>(i = <span class="number">0</span>; data; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        data &amp;= (data - <span class="number">1</span>) ;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> i;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>当然，单片机RAM有限，不可能同时运行太多的任务。</p>
+</li>
+<li><p>命令处理</p>
+<p>指通信协议方面，需要做一些处理，包括命令的解析与数据打包，命令的应答等。同时，也要注意不同设备状态下命令的处理，比如：任务已经打开，不允许再次打开操作，否则返回错误命令等。</p>
+</li>
+<li><p>看门狗</p>
+<p>采用外部看门狗芯片，放在主任务中处理，当然也还有其它处理方式，但是我理解不应该放在定时器中，因为有可能程序已经死机，但是定时器仍在运行，起不到应有的作用。</p>
+</li>
+<li><p>其它</p>
+<p>报警的标记与清除、交易记录、参数设置、数据保存与读取（互斥量保护）等方面的内容。</p>
+</li>
+</ul>
+<h4 id="4、问题"><a href="#4、问题" class="headerlink" title="4、问题"></a>4、问题</h4><p>（1）RS485接口速度</p>
+<p>板子的rs232与rs485从同一个uart引出，但是对于rs485接口，当波特率超过9600，数据收发就会出现错误，但是RS232即使波特率到了115200也是没有问题的。</p>
+<p>板子与485设备均在机器内部，长度可能也就几十公分，在开发、测试时长度更短，并且总线上只有这一个485设备。</p>
+<p>一个原因是板子的设计问题，另一个是接地问题，还可能是软件处理收发方向的问题。这个需要后续进一步地验证。</p>
+<p>（2）液体计量精度</p>
+<p>在管路上有一个编码器，通过统计编码器脉冲数可以计算得到流过的液体体积。当然精度不是很高，一是没有高精度的流量计，二是安装方式也会有很大的影响。因为并没有拿到一个产品的精确参数，只能通过多次测试来得到比较精确地参数。</p>
+<p>当然，本产品也不需要很高的精度，否则就需要更高精度的物理实现了。</p>
+<h4 id="5、总结"><a href="#5、总结" class="headerlink" title="5、总结"></a>5、总结</h4><p>本文从应用的角度总结了项目的软件结构，整个软件还包括上位机通信协议设计，这是很重要的一部分。其实这里的上位机就是一个运行Android系统的屏，安装在机器上作为用户操作的界面，与它的通信通过RS232进行，Android屏作为通信的发起者，这里的单片机程序接收数据并应答。</p>
+<p>整个项目从软件的设计、开发调试，到最后的测试，这个过程中遇到了一些问题，还有一些很低级的错误。但是因为涉及到多个部门，所以需要耐心沟通，慢慢调试，找出问题并解决之。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://aya-lxl.github.io/2021/02/28/%E8%87%AA%E5%8A%A8%E5%BC%80%E5%85%B3%E6%B5%8B%E8%AF%95/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1038,7 +1166,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">9</span>
+          <span class="site-state-item-count">10</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1051,7 +1179,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-count">8</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
