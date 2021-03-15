@@ -20,12 +20,12 @@
     var CONFIG = {"hostname":"aya-lxl.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="STM32F103窗口看门狗（Window watchdog） 1、结构框图  从RCC产生的时钟经过4096分频后进入WDG预分频器  WWDG_CR寄存器之T[6:0]是看门狗计数器值，预分频器每产生一个时钟减一。当从0x40变为0x3F时产生看门狗复位（T6位跳变到0）。  WWDG_CFR寄存器之W[6:0]是窗口值，用来与递减计数器T进行比较，W[6:0]应该小于0x80。当计数器T的值">
+  <meta name="description" content="STM32F103窗口看门狗（Window watchdog） 1、结构框图">
 <meta property="og:type" content="article">
 <meta property="og:title" content="wwdg">
 <meta property="og:url" content="https://aya-lxl.github.io/2021/02/01/wwdg/index.html">
 <meta property="og:site_name" content="直到海角天涯">
-<meta property="og:description" content="STM32F103窗口看门狗（Window watchdog） 1、结构框图  从RCC产生的时钟经过4096分频后进入WDG预分频器  WWDG_CR寄存器之T[6:0]是看门狗计数器值，预分频器每产生一个时钟减一。当从0x40变为0x3F时产生看门狗复位（T6位跳变到0）。  WWDG_CFR寄存器之W[6:0]是窗口值，用来与递减计数器T进行比较，W[6:0]应该小于0x80。当计数器T的值">
+<meta property="og:description" content="STM32F103窗口看门狗（Window watchdog） 1、结构框图">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://s3.ax1x.com/2021/02/01/yV0yT0.png">
 <meta property="og:image" content="https://s3.ax1x.com/2021/02/01/yV0ckV.png">
