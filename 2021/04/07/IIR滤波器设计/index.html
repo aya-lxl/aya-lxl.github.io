@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"aya-lxl.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="〇、说明使用scipy库来设计低通滤波器，这里使用1Hz与50Hz的两个频率信号叠加，之后通过滤波器之后观察效果。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="IIR滤波器设计">
+<meta property="og:url" content="https://aya-lxl.github.io/2021/04/07/IIR%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AE%BE%E8%AE%A1/index.html">
+<meta property="og:site_name" content="直到海角天涯">
+<meta property="og:description" content="〇、说明使用scipy库来设计低通滤波器，这里使用1Hz与50Hz的两个频率信号叠加，之后通过滤波器之后观察效果。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://z3.ax1x.com/2021/04/07/c87G0s.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/04/07/c87hcD.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/04/07/c874je.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/04/07/c8HSBj.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/04/07/c8HPNq.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/04/07/c8HGvD.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/04/07/c8HoxU.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/04/07/c8HbqJ.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/04/07/c8bPqH.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/04/07/c8bAII.png">
+<meta property="article:published_time" content="2021-04-07T09:26:43.000Z">
+<meta property="article:modified_time" content="2021-04-07T09:27:14.107Z">
+<meta property="article:author" content="aya_lxl@163.com">
+<meta property="article:tag" content="filter">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://z3.ax1x.com/2021/04/07/c87G0s.png">
+
+<link rel="canonical" href="https://aya-lxl.github.io/2021/04/07/IIR%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AE%BE%E8%AE%A1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>IIR滤波器设计 | 直到海角天涯</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">直到海角天涯</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://aya-lxl.github.io/2021/04/07/IIR%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AE%BE%E8%AE%A1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="aya_lxl@163.com">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="直到海角天涯">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          IIR滤波器设计
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-04-07 17:26:43 / 修改时间：17:27:14" itemprop="dateCreated datePublished" datetime="2021-04-07T17:26:43+08:00">2021-04-07</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Signal-processing/" itemprop="url" rel="index"><span itemprop="name">Signal processing</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h4 id="〇、说明"><a href="#〇、说明" class="headerlink" title="〇、说明"></a>〇、说明</h4><p>使用scipy库来设计低通滤波器，这里使用1Hz与50Hz的两个频率信号叠加，之后通过滤波器之后观察效果。</p>
+<h4 id="一、滤波器设计"><a href="#一、滤波器设计" class="headerlink" title="一、滤波器设计"></a>一、滤波器设计</h4><p>使用signal.sosfreqz得到幅频响应。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">sos=signal.butter(<span class="number">2</span>, <span class="number">20</span>, <span class="string">&#x27;lowpass&#x27;</span>, fs=<span class="number">500</span>, output=<span class="string">&#x27;sos&#x27;</span>)</span><br><span class="line">w, h = signal.sosfreqz(sos, fs=<span class="number">500</span>)</span><br><span class="line"></span><br><span class="line">fig = plt.figure()</span><br><span class="line"></span><br><span class="line">ax = fig.add_subplot(<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>)</span><br><span class="line">ax.semilogx(w, <span class="number">20</span> * np.log10(<span class="built_in">abs</span>(h)))</span><br><span class="line">ax.set_title(<span class="string">&#x27;butter lowpass frequency response&#x27;</span>)</span><br><span class="line">ax.set_xlabel(<span class="string">&#x27;Frequency [Hz]&#x27;</span>)</span><br><span class="line">ax.set_ylabel(<span class="string">&#x27;Amplitude [dB]&#x27;</span>)</span><br><span class="line">ax.grid(which=<span class="string">&#x27;both&#x27;</span>, axis=<span class="string">&#x27;both&#x27;</span>)</span><br><span class="line"></span><br><span class="line">ax2 = ax.twinx()</span><br><span class="line">angles = np.unwrap(np.angle(h))</span><br><span class="line">ax2.plot(w, angles, <span class="string">&#x27;g&#x27;</span>)</span><br><span class="line">ax2.set_ylabel(<span class="string">&#x27;Angle [radians]&#x27;</span>, color=<span class="string">&#x27;g&#x27;</span>)</span><br><span class="line"></span><br><span class="line">plt.show()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>程序的图形如下：</p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/c87G0s"><img src="https://z3.ax1x.com/2021/04/07/c87G0s.png" alt="c87G0s.png"></a></p>
+<h4 id="二、滤波效果"><a href="#二、滤波效果" class="headerlink" title="二、滤波效果"></a>二、滤波效果</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> scipy <span class="keyword">import</span> signal</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">from</span> scipy.fft <span class="keyword">import</span> fftfreq</span><br><span class="line"></span><br><span class="line">N=<span class="number">500</span> <span class="comment">#采样点数</span></span><br><span class="line">T=<span class="number">1</span>/N <span class="comment">#采样周期</span></span><br><span class="line"></span><br><span class="line">t = np.linspace(<span class="number">0</span>, T*N, N, <span class="literal">False</span>)</span><br><span class="line">sig1=np.sin(<span class="number">2</span>*np.pi*<span class="number">1</span>*t)</span><br><span class="line">sig2=np.sin(<span class="number">2</span>*np.pi*<span class="number">50</span>*t)</span><br><span class="line">sig = sig1 + sig2 <span class="comment">#生成信号</span></span><br><span class="line"></span><br><span class="line">fig, (ax1, ax2,ax3) = plt.subplots(<span class="number">3</span>, <span class="number">1</span>, sharex=<span class="literal">True</span>)</span><br><span class="line">ax1.plot(t, sig)</span><br><span class="line">ax1.set_title(<span class="string">&#x27;10 Hz and 50 Hz sinusoids&#x27;</span>)</span><br><span class="line">ax1.axis([<span class="number">0</span>, T*N, -<span class="number">2</span>, <span class="number">2</span>])</span><br><span class="line">ax1.grid()</span><br><span class="line"></span><br><span class="line">sos = signal.butter(<span class="number">2</span>, <span class="number">20</span>, <span class="string">&#x27;lp&#x27;</span>, fs=N, output=<span class="string">&#x27;sos&#x27;</span>) <span class="comment">#2阶低通滤波器，截止频率20Hz。</span></span><br><span class="line"></span><br><span class="line">filtered = signal.sosfilt(sos, sig) <span class="comment">#使用库函数处理数据</span></span><br><span class="line">ax2.plot(t, filtered)</span><br><span class="line">ax2.set_title(<span class="string">&#x27;After 15 Hz lp-pass filter&#x27;</span>)</span><br><span class="line">ax2.axis([<span class="number">0</span>, T*N, -<span class="number">2</span>, <span class="number">2</span>])</span><br><span class="line">ax2.set_xlabel(<span class="string">&#x27;Time&#x27;</span>)</span><br><span class="line"></span><br><span class="line">ax2.grid()</span><br><span class="line">plt.tight_layout()</span><br><span class="line"><span class="comment">#plt.show()</span></span><br><span class="line"></span><br><span class="line"><span class="comment">########################################################################</span></span><br><span class="line"><span class="comment">#使用自己写的方法来处理数据</span></span><br><span class="line">b,a=signal.sos2tf(sos) <span class="comment"># 将滤波器SOS参数转为b,a的形式</span></span><br><span class="line">b0=b[<span class="number">0</span>]</span><br><span class="line">b1=b[<span class="number">1</span>]</span><br><span class="line">b2=b[<span class="number">2</span>]</span><br><span class="line">a0=a[<span class="number">0</span>]</span><br><span class="line">a1=a[<span class="number">1</span>]</span><br><span class="line">a2=a[<span class="number">2</span>]</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">filr2</span>(<span class="params">data</span>):</span></span><br><span class="line">    out=[]</span><br><span class="line"></span><br><span class="line">    Xn1 = <span class="number">0</span></span><br><span class="line">    Xn2 = <span class="number">0</span></span><br><span class="line">    Yn1 = <span class="number">0</span></span><br><span class="line">    Yn2 = <span class="number">0</span></span><br><span class="line">    </span><br><span class="line">    index=<span class="number">0</span></span><br><span class="line">    sample=<span class="built_in">len</span>(data)</span><br><span class="line">    <span class="keyword">while</span> sample &gt; <span class="number">0</span>:</span><br><span class="line">        Xn = data[index]</span><br><span class="line">        acc = (b0 * Xn) + (b1 * Xn1) + (b2 * Xn2) -(a1 * Yn1) - (a2 * Yn2)</span><br><span class="line">        out.append(acc)</span><br><span class="line"></span><br><span class="line">        Xn2 = Xn1</span><br><span class="line">        Xn1 = Xn</span><br><span class="line">        Yn2 = Yn1</span><br><span class="line">        Yn1 = acc</span><br><span class="line"></span><br><span class="line">        index+=<span class="number">1</span></span><br><span class="line">        sample-=<span class="number">1</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> out</span><br><span class="line"></span><br><span class="line"><span class="comment">####################################################################</span></span><br><span class="line">out=filr2(sig)</span><br><span class="line">ax3.plot(t, out)</span><br><span class="line">ax3.set_title(<span class="string">&#x27;After 15 Hz low-pass filter&#x27;</span>)</span><br><span class="line">ax3.axis([<span class="number">0</span>, T*N, -<span class="number">2</span>, <span class="number">2</span>])</span><br><span class="line">ax3.set_xlabel(<span class="string">&#x27;Time&#x27;</span>)</span><br><span class="line">plt.tight_layout()</span><br><span class="line"></span><br><span class="line">ax3.grid()</span><br><span class="line">plt.show()</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>signal.sosfilt可以参考<a target="_blank" rel="noopener" href="https://docs.scipy.org/doc/scipy-1.0.0/reference/generated/scipy.signal.sosfilt.html#scipy.signal.sosfilt">官方文档</a>，或者该<a target="_blank" rel="noopener" href="https://vimsky.com/examples/usage/python-scipy.signal.sosfilt.html">中文示例</a>。</p>
+<p>频谱的计算与显示：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">amp_ang_resp</span>(<span class="params">data,N,T</span>):</span></span><br><span class="line">    yf= np.fft.fft(data)</span><br><span class="line">    xf = fftfreq(N, T)[:N//<span class="number">2</span>]</span><br><span class="line">    plt.plot(xf, <span class="number">2.0</span>/N * np.<span class="built_in">abs</span>(yf[<span class="number">0</span>:N//<span class="number">2</span>]))</span><br><span class="line">    plt.grid()</span><br><span class="line">    plt.show()</span><br><span class="line">    </span><br><span class="line">amp_ang_resp(sig,N,T)</span><br><span class="line">amp_ang_resp(filtered,N,T)</span><br><span class="line">amp_ang_resp(out,N,T)</span><br></pre></td></tr></table></figure>
+
+
+<h5 id="1、采样率N-500"><a href="#1、采样率N-500" class="headerlink" title="1、采样率N=500"></a>1、采样率N=500</h5><p>（1）原始数据的波形与使用两种方法滤波后的波形。</p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/c87hcD"><img src="https://z3.ax1x.com/2021/04/07/c87hcD.png" alt="c87hcD.png"></a></p>
+<p>从上图可以明显的看出滤波效果，即仍然存在小幅度的比较高的频率信号。</p>
+<p>（2）原始数据的频谱：</p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/c874je"><img src="https://z3.ax1x.com/2021/04/07/c874je.png" alt="c874je.png"></a></p>
+<p>（3）使用signal.sosfilt滤波后的频谱：</p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/c8HSBj"><img src="https://z3.ax1x.com/2021/04/07/c8HSBj.png" alt="c8HSBj.png"></a></p>
+<p>（4）使用自己写的函数处理后的频谱：</p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/c8HPNq"><img src="https://z3.ax1x.com/2021/04/07/c8HPNq.png" alt="c8HPNq.png"></a></p>
+<p>从频谱图中可以清晰的看到，在50Hz处存在一个小的幅值。</p>
+<h5 id="2、增加阶数"><a href="#2、增加阶数" class="headerlink" title="2、增加阶数"></a>2、增加阶数</h5><p>（1）如果仍使用上述参数，但是滤波处理函数改为signal.sosfiltfilt，那么效果会变好，但是相当于阶数增加为4阶了。</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://docs.scipy.org/doc/scipy-1.0.0/reference/generated/scipy.signal.sosfiltfilt.html">signal.sosfiltfilt官方文档</a></p>
+<p>Using forward-backward filtering, whether it is using the b,a parameter  form or the sos form, doubles the effective order of the filtering when  compared to a simple forward filter. That is the reason why <a target="_blank" rel="noopener" href="https://docs.scipy.org/doc/scipy-1.0.0/reference/generated/scipy.signal.sosfiltfilt.html"><code>scipy.signal.sosfiltfilt</code></a>‘s example compares a 4th-order Butterworth filter using <code>sosfiltfilt</code> with an 8th-order Butterworth filter using <code>sosfilt</code>.<a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/55211745/b-a-and-sos-filter-order-different-in-case-of-filtfilt">参考</a></p>
+</blockquote>
+<p>在其它参数不变的情况下，使用signal.sosfiltfilt滤波的效果如下图所示：</p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/c8HGvD"><img src="https://z3.ax1x.com/2021/04/07/c8HGvD.png" alt="c8HGvD.png"></a></p>
+<p>（2）若使用4阶的系数，那么同样效果会比较好，如下图。同时需要做如下修改：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sos = signal.butter(<span class="number">4</span>, <span class="number">20</span>, <span class="string">&#x27;lp&#x27;</span>, fs=N, output=<span class="string">&#x27;sos&#x27;</span>)</span><br></pre></td></tr></table></figure>
+<p>滤波器幅频响应如下：</p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/c8HoxU"><img src="https://z3.ax1x.com/2021/04/07/c8HoxU.png" alt="c8HoxU.png"></a></p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/c8HbqJ"><img src="https://z3.ax1x.com/2021/04/07/c8HbqJ.png" alt="c8HbqJ.png"></a></p>
+<p>使用signal.filt的效果：</p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/c8bPqH"><img src="https://z3.ax1x.com/2021/04/07/c8bPqH.png" alt="c8bPqH.png"></a></p>
+<p>使用自己写的滤波函数的效果：</p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/c8bAII"><img src="https://z3.ax1x.com/2021/04/07/c8bAII.png" alt="c8bAII.png"></a></p>
+<p>4阶的计算方法如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">b,a=signal.sos2tf(sos)</span><br><span class="line">b0=b[<span class="number">0</span>]</span><br><span class="line">b1=b[<span class="number">1</span>]</span><br><span class="line">b2=b[<span class="number">2</span>]</span><br><span class="line">b3=b[<span class="number">3</span>]</span><br><span class="line">b4=b[<span class="number">4</span>]</span><br><span class="line"></span><br><span class="line">a0=a[<span class="number">0</span>]</span><br><span class="line">a1=a[<span class="number">1</span>]</span><br><span class="line">a2=a[<span class="number">2</span>]</span><br><span class="line">a3=a[<span class="number">3</span>]</span><br><span class="line">a4=a[<span class="number">4</span>]</span><br><span class="line"></span><br><span class="line">pState=[<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>]</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">filr4</span>(<span class="params">data</span>):</span></span><br><span class="line">    <span class="keyword">global</span> pState</span><br><span class="line"></span><br><span class="line">    out=[]</span><br><span class="line"></span><br><span class="line">    Xn1 = pState[<span class="number">0</span>];</span><br><span class="line">    Xn2 = pState[<span class="number">1</span>];</span><br><span class="line">    Xn3 = pState[<span class="number">2</span>];</span><br><span class="line">    Xn4 = pState[<span class="number">3</span>];</span><br><span class="line">    Yn1 = pState[<span class="number">4</span>];</span><br><span class="line">    Yn2 = pState[<span class="number">5</span>];</span><br><span class="line">    Yn3 = pState[<span class="number">6</span>];</span><br><span class="line">    Yn4 = pState[<span class="number">7</span>];</span><br><span class="line">    </span><br><span class="line">    index=<span class="number">0</span></span><br><span class="line">    sample=<span class="built_in">len</span>(data)</span><br><span class="line">    <span class="keyword">while</span> sample &gt; <span class="number">0</span>:</span><br><span class="line">        Xn = data[index]</span><br><span class="line">        acc = (b0 * Xn) + (b1 * Xn1) + (b2 * Xn2)+ (b3 * Xn3) + (b4 * Xn4) -(a1 * Yn1) - (a2 * Yn2) -(a3 * Yn3) - (a4 * Yn4)</span><br><span class="line">        out.append(acc)</span><br><span class="line"></span><br><span class="line">        Xn4 = Xn3</span><br><span class="line">        Xn3 = Xn2</span><br><span class="line">        Xn2 = Xn1</span><br><span class="line">        Xn1 = Xn</span><br><span class="line">        </span><br><span class="line">        Yn4 = Yn3</span><br><span class="line">        Yn3 = Yn2</span><br><span class="line">        Yn2 = Yn1</span><br><span class="line">        Yn1 = acc</span><br><span class="line"></span><br><span class="line">        index+=<span class="number">1</span></span><br><span class="line">        sample-=<span class="number">1</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> out</span><br></pre></td></tr></table></figure>
+
+
+<hr>
+<p>下面几句话与上面没有太大的关系，但是挺有启发意义，记录下。<a target="_blank" rel="noopener" href="https://www.zhihu.com/question/436533003/answer/1653408441">参考</a></p>
+<p>采样频率是联系离散时间域和连续时间域的纽带：从时域上看，采样频率的倒数代表了两个相邻样点间的时间；从频域上看，采样频率的一半是离散时间信号所能表征的最高频率。</p>
+<p>所以，数字滤波器的设计，不管是通带截止频率还是阻带截止频率，理论上都不能超过采样频率的一半。实际上，在数字滤波器设计中，通常把采样频率的一半定义为归一化频率“1”，用一个小于“1”的值（比如说0.2）来定义数字滤波器的通带或阻带截止频率（相当于定义的是截止频率对半采样率的比值）。</p>
+<p>工程上，在较高采样率上实现数字滤波器，一般而言功耗会大一些。但在过低的采样率上实现数字滤波器也会有一些实际的限制：想象一下，如果要实现一个归一化截止频率为0.49的低通滤波器，会要求多窄的滤波器过度带（0.49～0.5）；而只要采样率升高一倍，相同低通滤波器的归一化截止频率就变成了0.245，就不会有实现上的困难了。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/filter/" rel="tag"># filter</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/03/17/const%E5%AD%97%E7%AC%A6%E4%B8%B2/" rel="prev" title="const字符串">
+      <i class="fa fa-chevron-left"></i> const字符串
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E3%80%87%E3%80%81%E8%AF%B4%E6%98%8E"><span class="nav-number">1.</span> <span class="nav-text">〇、说明</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AE%BE%E8%AE%A1"><span class="nav-number">2.</span> <span class="nav-text">一、滤波器设计</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E6%BB%A4%E6%B3%A2%E6%95%88%E6%9E%9C"><span class="nav-number">3.</span> <span class="nav-text">二、滤波效果</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1%E3%80%81%E9%87%87%E6%A0%B7%E7%8E%87N-500"><span class="nav-number">3.1.</span> <span class="nav-text">1、采样率N&#x3D;500</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2%E3%80%81%E5%A2%9E%E5%8A%A0%E9%98%B6%E6%95%B0"><span class="nav-number">3.2.</span> <span class="nav-text">2、增加阶数</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">aya_lxl@163.com</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">aya_lxl@163.com</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
