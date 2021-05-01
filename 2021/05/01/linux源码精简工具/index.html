@@ -20,22 +20,24 @@
     var CONFIG = {"hostname":"aya-lxl.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="看代码应该比较明白，记录一下，防止忘记。也欢迎各位随时指正。 一段简单的C语言程序，关于const、字符串。">
+  <meta name="description" content="因为linux中包含各种处理器与驱动，若直接使用source insight建立工程，工程同步时间会比较长。另一方面，一个结构体或者变量可能会有多个定义，搞不清楚到底是使用了哪一个，给初学者带来了一些困扰。 使用PF_Prj_Gen工具就可以避免这样的问题，因为它只记录进行编译的那些文件。当然，还参考了网上一些文章，在此一并致谢。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="const字符串">
-<meta property="og:url" content="https://aya-lxl.github.io/2021/03/17/const%E5%AD%97%E7%AC%A6%E4%B8%B2/index.html">
+<meta property="og:title" content="linux源码精简工具">
+<meta property="og:url" content="https://aya-lxl.github.io/2021/05/01/linux%E6%BA%90%E7%A0%81%E7%B2%BE%E7%AE%80%E5%B7%A5%E5%85%B7/index.html">
 <meta property="og:site_name" content="直到海角天涯">
-<meta property="og:description" content="看代码应该比较明白，记录一下，防止忘记。也欢迎各位随时指正。 一段简单的C语言程序，关于const、字符串。">
+<meta property="og:description" content="因为linux中包含各种处理器与驱动，若直接使用source insight建立工程，工程同步时间会比较长。另一方面，一个结构体或者变量可能会有多个定义，搞不清楚到底是使用了哪一个，给初学者带来了一些困扰。 使用PF_Prj_Gen工具就可以避免这样的问题，因为它只记录进行编译的那些文件。当然，还参考了网上一些文章，在此一并致谢。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://s3.ax1x.com/2021/03/17/66nJfg.png">
-<meta property="article:published_time" content="2021-03-17T05:21:10.000Z">
-<meta property="article:modified_time" content="2021-03-17T05:25:44.494Z">
+<meta property="og:image" content="https://z3.ax1x.com/2021/05/01/gVRqKK.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/05/01/gVRvUH.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/05/01/gVRx5d.png">
+<meta property="article:published_time" content="2021-05-01T08:18:17.000Z">
+<meta property="article:modified_time" content="2021-05-01T08:20:50.744Z">
 <meta property="article:author" content="aya_lxl@163.com">
-<meta property="article:tag" content="笔记">
+<meta property="article:tag" content="工具">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://s3.ax1x.com/2021/03/17/66nJfg.png">
+<meta name="twitter:image" content="https://z3.ax1x.com/2021/05/01/gVRqKK.png">
 
-<link rel="canonical" href="https://aya-lxl.github.io/2021/03/17/const%E5%AD%97%E7%AC%A6%E4%B8%B2/">
+<link rel="canonical" href="https://aya-lxl.github.io/2021/05/01/linux%E6%BA%90%E7%A0%81%E7%B2%BE%E7%AE%80%E5%B7%A5%E5%85%B7/">
 
 
 <script id="page-configurations">
@@ -48,7 +50,7 @@
   };
 </script>
 
-  <title>const字符串 | 直到海角天涯</title>
+  <title>linux源码精简工具 | 直到海角天涯</title>
   
 
 
@@ -163,7 +165,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://aya-lxl.github.io/2021/03/17/const%E5%AD%97%E7%AC%A6%E4%B8%B2/">
+    <link itemprop="mainEntityOfPage" href="https://aya-lxl.github.io/2021/05/01/linux%E6%BA%90%E7%A0%81%E7%B2%BE%E7%AE%80%E5%B7%A5%E5%85%B7/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -176,7 +178,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          const字符串
+          linux源码精简工具
         </h1>
 
         <div class="post-meta">
@@ -187,7 +189,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2021-03-17 13:21:10 / 修改时间：13:25:44" itemprop="dateCreated datePublished" datetime="2021-03-17T13:21:10+08:00">2021-03-17</time>
+              <time title="创建时间：2021-05-01 16:18:17 / 修改时间：16:20:50" itemprop="dateCreated datePublished" datetime="2021-05-01T16:18:17+08:00">2021-05-01</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -195,7 +197,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C</span></a>
+                  <a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a>
                 </span>
             </span>
 
@@ -210,13 +212,26 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>看代码应该比较明白，记录一下，防止忘记。也欢迎各位随时指正。</p>
-<p>一段简单的C语言程序，关于const、字符串。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">pp</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">char</span> str1[] = <span class="string">&quot;abc&quot;</span>; </span><br><span class="line">    <span class="keyword">char</span> str2[] = <span class="string">&quot;abc&quot;</span>; </span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">char</span> str3[] = <span class="string">&quot;abc&quot;</span>; </span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">char</span> str4[] = <span class="string">&quot;abc&quot;</span>; </span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">char</span> *str5 = <span class="string">&quot;abc&quot;</span>; </span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">char</span> *str6 = <span class="string">&quot;abc&quot;</span>; </span><br><span class="line">    <span class="keyword">char</span> *str7 = <span class="string">&quot;abc&quot;</span>; </span><br><span class="line">    <span class="keyword">char</span> *str8 = <span class="string">&quot;abc&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>,str1 == str2);<span class="comment">//0</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>,str3 == str4);<span class="comment">//0</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>,str5 == str6);<span class="comment">//1</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>,str7 == str8);<span class="comment">//1</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>,str6 == str7);<span class="comment">//1</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">getNum</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">100</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> n = <span class="number">90</span>;</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">int</span> MaxNum1 = getNum();  <span class="comment">//运行时初始化</span></span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">int</span> MaxNum2 = n;  <span class="comment">//运行时初始化</span></span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">int</span> MaxNum3 = <span class="number">80</span>;  <span class="comment">//编译时初始化</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%d, %d, %d\n&quot;</span>, MaxNum1, MaxNum2, MaxNum3);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">char</span> *str1 = <span class="string">&quot;cbiancheng&quot;</span>;</span><br><span class="line">    <span class="keyword">char</span> *str2;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;str1:%s\n&quot;</span>,str1);</span><br><span class="line"></span><br><span class="line">    str2=<span class="built_in">malloc</span>(<span class="number">8</span>);</span><br><span class="line">    <span class="keyword">if</span>(str2!=<span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        *str2=<span class="string">&#x27;b&#x27;</span>;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;str2:%s\n&quot;</span>,str2);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//char *str3 = (char *)str1;</span></span><br><span class="line">    <span class="comment">//*str3=&#x27;c&#x27;;//这里会有错误</span></span><br><span class="line"></span><br><span class="line">    pp();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>运行结果</p>
-<img src="https://s3.ax1x.com/2021/03/17/66nJfg.png" style="zoom:50%;" />
-
-<p>str1,str2,str3,str4是数组变量，它们有各自的内存空间；而str5,str6,str7,str8是指针，它们指向相同的常量区域。</p>
+        <p>因为linux中包含各种处理器与驱动，若直接使用source insight建立工程，工程同步时间会比较长。另一方面，一个结构体或者变量可能会有多个定义，搞不清楚到底是使用了哪一个，给初学者带来了一些困扰。</p>
+<p>使用<a target="_blank" rel="noopener" href="https://github.com/tonyho/Generate_Kernel_Uboot_Project_forIDE">PF_Prj_Gen</a>工具就可以避免这样的问题，因为它只记录进行编译的那些文件。当然，还参考了网上一些<a target="_blank" rel="noopener" href="https://www.pianshen.com/article/77331518661/">文章</a>，在此一并致谢。</p>
+<p>使用方法如该工具的readme.md所述。</p>
+<h5 id="1、Compile"><a href="#1、Compile" class="headerlink" title="1、Compile"></a>1、Compile</h5><p>compile the kernel or u-boot source code。</p>
+<p>首先编译linux内核，这里使用虚拟机进行编译。</p>
+<h5 id="2、Clone"><a href="#2、Clone" class="headerlink" title="2、Clone"></a>2、Clone</h5><pre><code>git clone https://github.com/tonyho/Generate_Kernel_Uboot_Project_forIDE.git</code></pre>
+<p>也可以直接在网页下载下来，如下图。</p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/gVRqKK"><img src="https://z3.ax1x.com/2021/05/01/gVRqKK.png" alt="gVRqKK.png"></a></p>
+<h5 id="3、Generate"><a href="#3、Generate" class="headerlink" title="3、Generate"></a>3、Generate</h5><pre><code>cd Generate_kernel_uboot_project_forIDE
+./PF_Prj_Gen.sh Path_For_Compiled_Kernel(Uboot)_Directory OutPutProjectFileName</code></pre>
+<p>This would create the filelist for Understand and Source Insight and the Slickedit Project in Outputprojectfilename. THen you can use these output file to genenate the project.</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./PF_Prj_Gen.sh ../kernel/ out</span><br></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/gVRvUH"><img src="https://z3.ax1x.com/2021/05/01/gVRvUH.png" alt="gVRvUH.png"></a></p>
+<h5 id="4、source-insight"><a href="#4、source-insight" class="headerlink" title="4、source insight"></a>4、source insight</h5><p>将输出文件夹中的FileList_SourceInsight.txt复制出来。</p>
+<p>在新建工程添加文件时，按下图操作，选择add from list,选择刚才的FileList_SourceInsight.txt文件。</p>
+<p><a target="_blank" rel="noopener" href="https://imgtu.com/i/gVRx5d"><img src="https://z3.ax1x.com/2021/05/01/gVRx5d.png" alt="gVRx5d.png"></a></p>
+<p>以上就是基本操作，整体来说还是比较简单的，但是对初学者而言看代码就方便很多了。还是那句话，<strong>工欲善其事必先利其器</strong>。</p>
+<hr>
+<h5 id="文中资源与参考"><a href="#文中资源与参考" class="headerlink" title="文中资源与参考"></a>文中资源与参考</h5><p>1、<a target="_blank" rel="noopener" href="https://github.com/tonyho/Generate_Kernel_Uboot_Project_forIDE">https://github.com/tonyho/Generate_Kernel_Uboot_Project_forIDE</a></p>
+<p>2、<a target="_blank" rel="noopener" href="https://www.pianshen.com/article/77331518661/">https://www.pianshen.com/article/77331518661/</a></p>
 
     </div>
 
@@ -226,7 +241,7 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/%E7%AC%94%E8%AE%B0/" rel="tag"># 笔记</a>
+              <a href="/tags/%E5%B7%A5%E5%85%B7/" rel="tag"># 工具</a>
           </div>
 
         
@@ -235,13 +250,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2021/03/13/oled-am2320%E9%A9%B1%E5%8A%A8/" rel="prev" title="oled-am2320驱动">
-      <i class="fa fa-chevron-left"></i> oled-am2320驱动
+    <a href="/2021/04/07/IIR%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AE%BE%E8%AE%A1/" rel="prev" title="IIR滤波器设计">
+      <i class="fa fa-chevron-left"></i> IIR滤波器设计
     </a></div>
-      <div class="post-nav-item">
-    <a href="/2021/04/07/IIR%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AE%BE%E8%AE%A1/" rel="next" title="IIR滤波器设计">
-      IIR滤波器设计 <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -300,6 +312,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-5"><a class="nav-link" href="#1%E3%80%81Compile"><span class="nav-number">1.</span> <span class="nav-text">1、Compile</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2%E3%80%81Clone"><span class="nav-number">2.</span> <span class="nav-text">2、Clone</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3%E3%80%81Generate"><span class="nav-number">3.</span> <span class="nav-text">3、Generate</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4%E3%80%81source-insight"><span class="nav-number">4.</span> <span class="nav-text">4、source insight</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%96%87%E4%B8%AD%E8%B5%84%E6%BA%90%E4%B8%8E%E5%8F%82%E8%80%83"><span class="nav-number">5.</span> <span class="nav-text">文中资源与参考</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
