@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"aya-lxl.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="0、简介洗车机有多种不同的型号，比如有大型的、自动的，也有本文所述的小型的、自助式的。本文从整体的操作流程、软件的设计思路来分析。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一种自助设备的软件设计">
+<meta property="og:url" content="https://aya-lxl.github.io/2021/06/02/%E4%B8%80%E7%A7%8D%E8%87%AA%E5%8A%A9%E8%AE%BE%E5%A4%87%E7%9A%84%E8%BD%AF%E4%BB%B6%E8%AE%BE%E8%AE%A1/index.html">
+<meta property="og:site_name" content="直到海角天涯">
+<meta property="og:description" content="0、简介洗车机有多种不同的型号，比如有大型的、自动的，也有本文所述的小型的、自助式的。本文从整体的操作流程、软件的设计思路来分析。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-06-02T12:47:58.000Z">
+<meta property="article:modified_time" content="2021-06-02T12:57:58.437Z">
+<meta property="article:author" content="aya_lxl@163.com">
+<meta property="article:tag" content="设计">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://aya-lxl.github.io/2021/06/02/%E4%B8%80%E7%A7%8D%E8%87%AA%E5%8A%A9%E8%AE%BE%E5%A4%87%E7%9A%84%E8%BD%AF%E4%BB%B6%E8%AE%BE%E8%AE%A1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>一种自助设备的软件设计 | 直到海角天涯</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">直到海角天涯</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://aya-lxl.github.io/2021/06/02/%E4%B8%80%E7%A7%8D%E8%87%AA%E5%8A%A9%E8%AE%BE%E5%A4%87%E7%9A%84%E8%BD%AF%E4%BB%B6%E8%AE%BE%E8%AE%A1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="aya_lxl@163.com">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="直到海角天涯">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          一种自助设备的软件设计
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-06-02 20:47:58 / 修改时间：20:57:58" itemprop="dateCreated datePublished" datetime="2021-06-02T20:47:58+08:00">2021-06-02</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%BD%AF%E4%BB%B6/" itemprop="url" rel="index"><span itemprop="name">软件</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h4 id="0、简介"><a href="#0、简介" class="headerlink" title="0、简介"></a>0、简介</h4><p>洗车机有多种不同的型号，比如有大型的、自动的，也有本文所述的小型的、自助式的。本文从整体的操作流程、软件的设计思路来分析。</p>
+<h4 id="1、设计思路"><a href="#1、设计思路" class="headerlink" title="1、设计思路"></a>1、设计思路</h4><p>既然称作是自主式的，那么所有的操作需要用户自己去完成。设备不需要配备工作人员，不过日常维护还是需要的。当然，这可能涉及到具体的运营方式，这里不讨论。基本的工作流程如下。</p>
+<p>①机器上会有一个唯一的二维码，用户通过相应的软件（APP、小程序等）扫描，完成必要的操作（选择工作时长，支付等）。</p>
+<p>②服务器下发相关的必要信息。</p>
+<p>③设备接收到相关信息后，进入就绪状态，等待用户按键操作。这里的按键是设备上的按键，对应不同的功能，比如清水、泡沫、吸尘等。</p>
+<p>④用户操作按键后，设备响应不同的功能。</p>
+<p>⑤目前交易以时间控制为准，到达设定的工作时长后，机器停机，上传交易，最后恢复空闲状态。</p>
+<h4 id="2、整体实现"><a href="#2、整体实现" class="headerlink" title="2、整体实现"></a>2、整体实现</h4><h5 id="（1）二维码"><a href="#（1）二维码" class="headerlink" title="（1）二维码"></a>（1）二维码</h5><p>每个设备唯一，需要与设备绑定起来。当实现扫码支付后，服务器知道向谁发送信息。</p>
+<p>设备使用4G DTU来实现通信的，所以设备在服务器的注册等操作与之相关，比如使用IMEI来唯一标识该设备。</p>
+<h5 id="（2）通信"><a href="#（2）通信" class="headerlink" title="（2）通信"></a>（2）通信</h5><p>①设备与服务器的通信使用DTU模块来实现。DTU与主板之间使用RS232或者RS485通信，但是按照该DTU的使用说明，二者不应同时使用，因为它们是同一个串口。本文要使用的主板型号也存在同样的问题，同一uart扩展出RS232与RS485，最多只能时分复用。</p>
+<p>②通信协议使用mqtt，在这之上需要实现自有的通信协议。为加快进度，同时考虑到单片机RAM，mqtt直接使用DTU的协议栈。我们所要实现的就是自有协议。另一方面，为了具有更好的可移植性，在条件允许的情况下可以由单片机来实现mqtt。</p>
+<p>③如一些物联网平台，mqtt通信数据使用json格式。单片机需要解析、打包json数据。</p>
+<p>因为json数据可以嵌套，所以为了解析更精简，只支持自定义协议中的格式。</p>
+<p>④当设备状态变化时才发数据，而我之前的思路是每隔一段时间（比如2秒）发一次数据。这里的数据不包括心跳数据。</p>
+<p><strong>这会有什么问题呢？</strong></p>
+<p>一方面，减少设备工作负担，减少通信流量；另一方面，如果因为某种原因通信中断了，服务器如何及时知晓呢？当然可以利用心跳数据，但是其周期是60秒或者更长，那么从真正断线到没有心跳数据这段时间就会存在争议。</p>
+<p>⑤单片机的控制逻辑中的命令与服务器命令相互独立，也就是软件中常说的低耦合性。</p>
+<p>⑥信息之间的时间间隔</p>
+<p>这是在测试中实际遇到的问题。如果主板单片机不做控制，那么服务器有可能接收到连接在一起的两个消息，进而造成数据解析问题。</p>
+<p>因为数据是经过DTU联网的，其处理过程未知，所以单片机需要保证一定的发送时间间隔。</p>
+<p>其实，对于此种情况，服务器端完全可以解析处理。</p>
+<h5 id="（3）设备控制逻辑"><a href="#（3）设备控制逻辑" class="headerlink" title="（3）设备控制逻辑"></a>（3）设备控制逻辑</h5><p>①设备有多种功能，需要用户去操作按钮以便进行切换。</p>
+<p>②每次工作时长的控制。</p>
+<p>③超时处理</p>
+<p>这个是必要的。就目前的设计方案而言，工作以时间长度控制。设想：如果未达到指定的工作时间，那么设备一直等待用户的下一步操作，但是用户此时可能已经离开了，而APP显示该设备仍在使用中，如此一来潜在的用户就不会去使用。所以在一定状态下，比如没有任何部件处于工作状态，需要超时控制。</p>
+<p>当然这个超时处理由谁实现也是一个问题：既可以由设备单片机本身实现，也可以由服务器实现，这就设计到功能划分了。当然，从完整性角度考虑，设备自身需要有一个处理过程，而不能仅仅依靠外界。</p>
+<p>设备上可以增加一个结束按钮，这样一切都会简单起来，问题是，不能强迫用户的行为，即便是有结束按钮，用户也可能因为某些原因不去操作，比如忘记了。</p>
+<p>④工作时才会计时</p>
+<p>比如虽然操作了按键，设备也正常工作，但是因为没有打开水枪开关，此时不能计时。当然，这是目前的设计思路，这样处理更能保证用户的合理权益。</p>
+<p>⑤水流速表问题</p>
+<p>水流速表一方面可以计量水的体积，另一方面，也可以作为判断是否有水流过的依据。</p>
+<p>如果一段时间内没有脉冲，那么可以认为没有水流动。原因可能是真的没有水，也可能是水枪没有打开开关。如果开启水枪功能后，长时间没水，那么就认为存在问题，作停机处理。关键点在于判断时长多少合适？</p>
+<p>经过实际的验证，如果时间过短，比如50ms，那么很可能会有问题。原因在于流量问题，如果流量比较小，水流速表的叶轮虽然确实在转动，但是产生的脉冲周期会变长，如果脉冲周期长于50ms，那么显然会造成误判断。所以，在允许的流量范围内，采用一个较大的检测时长，比如500ms。但是又不宜过长，因为检测时长会计入总时长（若不计入总时长，那么很显然设备运营方会受损失，但是计入总时长用户会受损失，所以需要一个平衡）。</p>
+<p>⑥其它</p>
+<p>还包括其它设备，诸如电接点压力表、LCD显示。</p>
+<h4 id="3、后续"><a href="#3、后续" class="headerlink" title="3、后续"></a>3、后续</h4><p>目前，软件开发基本完毕，与服务器通信测试也已完成。接下来就是在整机上的实际测试，并且在测试或者使用过程中还需要根据效果或者要求进一步改进。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%AE%BE%E8%AE%A1/" rel="tag"># 设计</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/05/20/%E7%94%B5%E6%8E%A5%E7%82%B9%E5%8E%8B%E5%8A%9B%E8%A1%A8/" rel="prev" title="电接点压力表">
+      <i class="fa fa-chevron-left"></i> 电接点压力表
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#0%E3%80%81%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">0、简介</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1%E3%80%81%E8%AE%BE%E8%AE%A1%E6%80%9D%E8%B7%AF"><span class="nav-number">2.</span> <span class="nav-text">1、设计思路</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2%E3%80%81%E6%95%B4%E4%BD%93%E5%AE%9E%E7%8E%B0"><span class="nav-number">3.</span> <span class="nav-text">2、整体实现</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%EF%BC%881%EF%BC%89%E4%BA%8C%E7%BB%B4%E7%A0%81"><span class="nav-number">3.1.</span> <span class="nav-text">（1）二维码</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%EF%BC%882%EF%BC%89%E9%80%9A%E4%BF%A1"><span class="nav-number">3.2.</span> <span class="nav-text">（2）通信</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%EF%BC%883%EF%BC%89%E8%AE%BE%E5%A4%87%E6%8E%A7%E5%88%B6%E9%80%BB%E8%BE%91"><span class="nav-number">3.3.</span> <span class="nav-text">（3）设备控制逻辑</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3%E3%80%81%E5%90%8E%E7%BB%AD"><span class="nav-number">4.</span> <span class="nav-text">3、后续</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">aya_lxl@163.com</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">18</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">aya_lxl@163.com</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
