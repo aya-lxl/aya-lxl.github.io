@@ -28,7 +28,7 @@
 <meta property="og:description" content="0、简介洗车机有多种不同的型号，比如有大型的、自动的，也有本文所述的小型的、自助式的。本文从整体的操作流程、软件的设计思路来分析。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-06-02T12:47:58.000Z">
-<meta property="article:modified_time" content="2021-06-02T12:57:58.437Z">
+<meta property="article:modified_time" content="2021-06-02T13:23:30.612Z">
 <meta property="article:author" content="aya_lxl@163.com">
 <meta property="article:tag" content="设计">
 <meta name="twitter:card" content="summary">
@@ -185,7 +185,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2021-06-02 20:47:58 / 修改时间：20:57:58" itemprop="dateCreated datePublished" datetime="2021-06-02T20:47:58+08:00">2021-06-02</time>
+              <time title="创建时间：2021-06-02 20:47:58 / 修改时间：21:23:30" itemprop="dateCreated datePublished" datetime="2021-06-02T20:47:58+08:00">2021-06-02</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -221,6 +221,8 @@
 <p>②通信协议使用mqtt，在这之上需要实现自有的通信协议。为加快进度，同时考虑到单片机RAM，mqtt直接使用DTU的协议栈。我们所要实现的就是自有协议。另一方面，为了具有更好的可移植性，在条件允许的情况下可以由单片机来实现mqtt。</p>
 <p>③如一些物联网平台，mqtt通信数据使用json格式。单片机需要解析、打包json数据。</p>
 <p>因为json数据可以嵌套，所以为了解析更精简，只支持自定义协议中的格式。</p>
+<p><strong>这里有2个问题：为何选择mqtt协议，直接使用TCP/IP不行吗？为何选择json格式数据？</strong></p>
+<p>其实对于单片机而言，直接发送数据流最方便，但是对服务器端而言可能就会存在一些不变或者问题。笔者不是太懂，只能冒昧猜测一下，若有不当之处请<a href="aya_lxl@163.com">指出</a>。服务器端需要处理诸多任务，比如支付、账号管理、消费信息处理等等，而mqtt是订阅发布的模式，可以达到异步、解耦的效果。使用json格式的数据，单片机就需要做许多额外的工作，数据解析与打包也更复杂，但是服务器端处理json应该会更加方便了，毕竟在服务器端的工具还是很多的。这个问题还是挺复杂的，架构也是在不断的演进的。</p>
 <p>④当设备状态变化时才发数据，而我之前的思路是每隔一段时间（比如2秒）发一次数据。这里的数据不包括心跳数据。</p>
 <p><strong>这会有什么问题呢？</strong></p>
 <p>一方面，减少设备工作负担，减少通信流量；另一方面，如果因为某种原因通信中断了，服务器如何及时知晓呢？当然可以利用心跳数据，但是其周期是60秒或者更长，那么从真正断线到没有心跳数据这段时间就会存在争议。</p>
