@@ -20,24 +20,20 @@
     var CONFIG = {"hostname":"aya-lxl.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="1 来历采用python编写的一个小工具，用来对接收到的数据进行图形化显示，目的是方便观察数据的波动。如果在考虑其它一些功能，比如计算均值、方差等，则可以更全面的对数据进行描述与解释。">
+  <meta name="description" content="求最小公倍数 参考网上的方法，并做改进。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="数据图形显示小工具">
-<meta property="og:url" content="https://aya-lxl.github.io/2021/01/18/%E6%95%B0%E6%8D%AE%E5%9B%BE%E5%BD%A2%E6%98%BE%E7%A4%BA%E5%B0%8F%E5%B7%A5%E5%85%B7/index.html">
+<meta property="og:title" content="最小公倍数">
+<meta property="og:url" content="https://aya-lxl.github.io/2021/06/15/%E6%9C%80%E5%B0%8F%E5%85%AC%E5%80%8D%E6%95%B0/index.html">
 <meta property="og:site_name" content="直到海角天涯">
-<meta property="og:description" content="1 来历采用python编写的一个小工具，用来对接收到的数据进行图形化显示，目的是方便观察数据的波动。如果在考虑其它一些功能，比如计算均值、方差等，则可以更全面的对数据进行描述与解释。">
+<meta property="og:description" content="求最小公倍数 参考网上的方法，并做改进。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://s3.ax1x.com/2021/01/18/scnfCd.png">
-<meta property="og:image" content="https://s3.ax1x.com/2021/01/18/scngED.png">
-<meta property="og:image" content="https://s3.ax1x.com/2021/01/18/scnR4H.png">
-<meta property="article:published_time" content="2021-01-18T11:41:53.000Z">
-<meta property="article:modified_time" content="2021-05-01T08:22:44.066Z">
+<meta property="article:published_time" content="2021-06-15T03:29:09.000Z">
+<meta property="article:modified_time" content="2021-06-15T03:31:15.072Z">
 <meta property="article:author" content="aya_lxl@163.com">
-<meta property="article:tag" content="工具">
+<meta property="article:tag" content="算法">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://s3.ax1x.com/2021/01/18/scnfCd.png">
 
-<link rel="canonical" href="https://aya-lxl.github.io/2021/01/18/%E6%95%B0%E6%8D%AE%E5%9B%BE%E5%BD%A2%E6%98%BE%E7%A4%BA%E5%B0%8F%E5%B7%A5%E5%85%B7/">
+<link rel="canonical" href="https://aya-lxl.github.io/2021/06/15/%E6%9C%80%E5%B0%8F%E5%85%AC%E5%80%8D%E6%95%B0/">
 
 
 <script id="page-configurations">
@@ -50,7 +46,7 @@
   };
 </script>
 
-  <title>数据图形显示小工具 | 直到海角天涯</title>
+  <title>最小公倍数 | 直到海角天涯</title>
   
 
 
@@ -165,7 +161,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://aya-lxl.github.io/2021/01/18/%E6%95%B0%E6%8D%AE%E5%9B%BE%E5%BD%A2%E6%98%BE%E7%A4%BA%E5%B0%8F%E5%B7%A5%E5%85%B7/">
+    <link itemprop="mainEntityOfPage" href="https://aya-lxl.github.io/2021/06/15/%E6%9C%80%E5%B0%8F%E5%85%AC%E5%80%8D%E6%95%B0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -178,7 +174,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          数据图形显示小工具
+          最小公倍数
         </h1>
 
         <div class="post-meta">
@@ -187,23 +183,17 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
+              
 
-              <time title="创建时间：2021-01-18 19:41:53" itemprop="dateCreated datePublished" datetime="2021-01-18T19:41:53+08:00">2021-01-18</time>
+              <time title="创建时间：2021-06-15 11:29:09 / 修改时间：11:31:15" itemprop="dateCreated datePublished" datetime="2021-06-15T11:29:09+08:00">2021-06-15</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-05-01 16:22:44" itemprop="dateModified" datetime="2021-05-01T16:22:44+08:00">2021-05-01</time>
-              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+                  <a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C</span></a>
                 </span>
             </span>
 
@@ -218,19 +208,11 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="1-来历"><a href="#1-来历" class="headerlink" title="1 来历"></a>1 来历</h2><p>采用python编写的一个小工具，用来对接收到的数据进行图形化显示，目的是方便观察数据的波动。如果在考虑其它一些功能，比如计算均值、方差等，则可以更全面的对数据进行描述与解释。</p>
-<p>因为工作中某个项目的原因，需要通过比例调节阀来控制液体流速。而控制比例调节阀的基础就是液体的流速，而测量流速的准确性关系到实际调节的准确性。所以该工具的目的就是在软件调试阶段，对流速测量与比例调节阀调节准确性进行评估，以便改进软件。</p>
-<h2 id="2-原理"><a href="#2-原理" class="headerlink" title="2 原理"></a>2 原理</h2><p>软件主要用到2个库：matplotlib、serial。</p>
-<p>首先打开串口，当然需要设置串口的参数，诸如波特率、校验等。当接收到数据时，进行绘图。这里有2种方法，（1）每次只画一个点，之前的点不清除；（2）每次清除之前的点，重新绘制所有的点，包括新接收到的点。显而易见，第二种方法比较耗费资源。两种方法的图形如下所示。</p>
-<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/scnfCd"><img src="https://s3.ax1x.com/2021/01/18/scnfCd.png" alt="scnfCd.png"></a></p>
-<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/scngED"><img src="https://s3.ax1x.com/2021/01/18/scngED.png" alt="scngED.png"></a></p>
-<p>其实，两种方法都可以看出动态效果，但是第二种方法画出的点是连在一起的显。</p>
-<h2 id="3-工况"><a href="#3-工况" class="headerlink" title="3 工况"></a>3 工况</h2><p>再来看一下实际中需要测量的液体流速。</p>
-<p><a target="_blank" rel="noopener" href="https://imgchr.com/i/scnR4H"><img src="https://s3.ax1x.com/2021/01/18/scnR4H.png" alt="scnR4H.png"></a></p>
-<p>可以看到尖峰存在，而且是两种峰值，似乎也有一定的周期性，猜想可能是某种系统性的原因引起的，可能是软件引起的，也可能是硬件引起的，或者干脆就是泵的稳定性有点差。</p>
-<p>但是数据仍稳定在一个较小的区间之内，比如上述图形数据的均值为89.41，标准差为0.13.</p>
-<p>如果存在外部的、独立的流速测量仪器，那么可以将其作为基准使用。但是，因为条件的限制，只能使用目前这种方法来调试。另外一个比较重要的原因是，该设备对流速没有很高的精度要求，每分钟40L或者45L影响不大，但是不能是每分钟80L。</p>
-<h2 id="4-结尾"><a href="#4-结尾" class="headerlink" title="4 结尾"></a>4 结尾</h2><p>该小程序只是个人作为调试使用的，为了方便工作。如果有需要，还可以增加串口参数设置、接收数据统计显示、数据保存等功能。</p>
+        <p>求最小公倍数</p>
+<p>参考网上的方法，并做改进。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc,<span class="keyword">char</span> **argv)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(argc!=<span class="number">3</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;argc count error\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> n1=atoi(argv[<span class="number">1</span>]),n2=atoi(argv[<span class="number">2</span>]);</span><br><span class="line">    <span class="keyword">int</span> minMultiple;</span><br><span class="line"> </span><br><span class="line">    minMultiple = (n1&gt;n2) ? n1 : n2;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">while</span>(<span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span>( minMultiple%n1==<span class="number">0</span> &amp;&amp; minMultiple%n2==<span class="number">0</span> )</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;%d 和 %d 的最小公倍数为 %d\n&quot;</span>, n1, n2,minMultiple);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        ++minMultiple;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/****************************************************/</span></span><br><span class="line">    <span class="comment">//下面是改进的方法</span></span><br><span class="line">    <span class="keyword">int</span> count=<span class="number">1</span>,big=(n1&gt;n2) ? n1 : n2;</span><br><span class="line">    minMultiple = big;</span><br><span class="line">    <span class="keyword">while</span>(<span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span>( minMultiple%n1==<span class="number">0</span> &amp;&amp; minMultiple%n2==<span class="number">0</span> )</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;%d 和 %d 的最小公倍数为 %d\n&quot;</span>, n1, n2,minMultiple);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        minMultiple+=big;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
 
     </div>
 
@@ -240,7 +222,7 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/%E5%B7%A5%E5%85%B7/" rel="tag"># 工具</a>
+              <a href="/tags/%E7%AE%97%E6%B3%95/" rel="tag"># 算法</a>
           </div>
 
         
@@ -249,13 +231,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2021/01/17/hexo%E5%AE%89%E8%A3%85/" rel="prev" title="hexo安装">
-      <i class="fa fa-chevron-left"></i> hexo安装
+    <a href="/2021/06/15/%E6%9C%80%E5%A4%A7%E5%85%AC%E7%BA%A6%E6%95%B0/" rel="prev" title="最大公约数">
+      <i class="fa fa-chevron-left"></i> 最大公约数
     </a></div>
-      <div class="post-nav-item">
-    <a href="/2021/01/19/%E4%B8%B2%E5%8F%A3%E6%95%B0%E6%8D%AE%E8%BD%AC%E5%8F%91%E4%B8%8E%E7%9B%91%E6%8E%A7/" rel="next" title="串口数据转发与监控">
-      串口数据转发与监控 <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -314,7 +293,6 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E6%9D%A5%E5%8E%86"><span class="nav-number">1.</span> <span class="nav-text">1 来历</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%8E%9F%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text">2 原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E5%B7%A5%E5%86%B5"><span class="nav-number">3.</span> <span class="nav-text">3 工况</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E7%BB%93%E5%B0%BE"><span class="nav-number">4.</span> <span class="nav-text">4 结尾</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
