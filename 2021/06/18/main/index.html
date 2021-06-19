@@ -20,15 +20,25 @@
     var CONFIG = {"hostname":"aya-lxl.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta property="og:type" content="article">
+  <meta name="description" content="0、说明LPC1115，keil。">
+<meta property="og:type" content="article">
 <meta property="og:title" content="__main">
 <meta property="og:url" content="https://aya-lxl.github.io/2021/06/18/main/index.html">
 <meta property="og:site_name" content="直到海角天涯">
+<meta property="og:description" content="0、说明LPC1115，keil。">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://z3.ax1x.com/2021/06/19/RPQASO.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/06/19/RPQqHA.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/06/19/RPlSgS.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/06/19/RPlY8K.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/06/19/RPQr1U.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/06/19/RPQI1O.png">
 <meta property="article:published_time" content="2021-06-17T23:01:16.000Z">
-<meta property="article:modified_time" content="2021-06-17T23:01:16.205Z">
+<meta property="article:modified_time" content="2021-06-19T10:07:45.173Z">
 <meta property="article:author" content="aya_lxl@163.com">
+<meta property="article:tag" content="boot">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://z3.ax1x.com/2021/06/19/RPQASO.png">
 
 <link rel="canonical" href="https://aya-lxl.github.io/2021/06/18/main/">
 
@@ -183,6 +193,22 @@
 
               <time title="创建时间：2021-06-18 07:01:16" itemprop="dateCreated datePublished" datetime="2021-06-18T07:01:16+08:00">2021-06-18</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-06-19 18:07:45" itemprop="dateModified" datetime="2021-06-19T18:07:45+08:00">2021-06-19</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8D%95%E7%89%87%E6%9C%BA/" itemprop="url" rel="index"><span itemprop="name">单片机</span></a>
+                </span>
+            </span>
 
           
 
@@ -195,7 +221,86 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        
+        <h5 id="0、说明"><a href="#0、说明" class="headerlink" title="0、说明"></a>0、说明</h5><p>LPC1115，keil。</p>
+<p>本文主要分析启动文件中__main函数的功能。</p>
+<h5 id="1、函数入口"><a href="#1、函数入口" class="headerlink" title="1、函数入口"></a>1、函数入口</h5><p>文件：startup_LPC11xx.s</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Reset_Handler   PROC</span><br><span class="line">                EXPORT  Reset_Handler             [WEAK]</span><br><span class="line">                IMPORT  SystemInit</span><br><span class="line">                IMPORT  __main</span><br><span class="line">                LDR     R0, &#x3D;SystemInit</span><br><span class="line">                BLX     R0</span><br><span class="line">                LDR     R0, &#x3D;__main</span><br><span class="line">                BX      R0</span><br><span class="line">                ENDP</span><br></pre></td></tr></table></figure>
+<p>这里的__main并不是main()函数，而是在进入C环境之前的预备工作，包括将RW变量从rom复制到ram指定位置，将.bss段清零，最后才跳转到用户的main函数。</p>
+<p>可以将编译完成的hex反汇编，结合map文件来分析__main函数。反汇编配置如下图所示。</p>
+<img src="https://z3.ax1x.com/2021/06/19/RPQASO.png" alt="RPQASO.png"  />
+
+
+
+<p><strong>“4”</strong>框是将hex文件处理为bin文件，也就是最终下载到单片机中的文件。</p>
+<h5 id="2、反汇编"><a href="#2、反汇编" class="headerlink" title="2、反汇编"></a>2、反汇编</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br></pre></td><td class="code"><pre><span class="line">__rt_entry</span><br><span class="line">__rt_entry_presh_1</span><br><span class="line">__rt_entry_sh</span><br><span class="line">    0x0000012c:    f000ff88    ....    BL       __user_setup_stackheap ; 0x1040</span><br><span class="line">    0x00000130:    4611        .F      MOV      r1,r2</span><br><span class="line">    </span><br><span class="line">    ;......</span><br><span class="line">        </span><br><span class="line">!!!main</span><br><span class="line">__main</span><br><span class="line">    0x000000c0:    f000f802    ....    BL       __scatterload ; 0xc8</span><br><span class="line">    0x000000c4:    f000f832    ..2.    BL       __rt_entry ; 0x12c</span><br><span class="line">!!!scatter</span><br><span class="line">__scatterload</span><br><span class="line">__scatterload_rt2</span><br><span class="line">__scatterload_rt2_thumb_only</span><br><span class="line">    0x000000c8:    a00c        ..      ADR      r0,&#123;pc&#125;+0x34 ; 0xfc</span><br><span class="line">    0x000000ca:    c830        0.      LDM      r0!,&#123;r4,r5&#125;</span><br><span class="line">    0x000000cc:    3808        .8      SUBS     r0,r0,#8</span><br><span class="line">    0x000000ce:    1824        $.      ADDS    r4,r4,r0;r4&#x3D;0x6ca0,Region$$Table$$Base</span><br><span class="line">    0x000000d0:    182d        -.      ADDS    r5,r5,r0 ;r5&#x3D;0x6cc0,Region$$Table末尾</span><br><span class="line">    0x000000d2:    46a2        .F      MOV      r10,r4</span><br><span class="line">    0x000000d4:    1e67        g.      SUBS     r7,r4,#1</span><br><span class="line">    0x000000d6:    46ab        .F      MOV      r11,r5</span><br><span class="line">__scatterload_null</span><br><span class="line">    0x000000d8:    4654        TF      MOV      r4,r10    ;r4&#x3D;0x6ca0</span><br><span class="line">    0x000000da:    465d        ]F      MOV      r5,r11    ;r5&#x3D;0x6cc0</span><br><span class="line">    0x000000dc:    42ac        .B      CMP      r4,r5</span><br><span class="line">    0x000000de:    d101        ..      BNE      0xe4 ; __scatterload_null + 12</span><br><span class="line">    0x000000e0:    f000f824    ..$.    BL    __rt_entry ; 0x12c,处理为2函数，跳转到该函数</span><br><span class="line">    0x000000e4:    467e        ~F      MOV      r6,pc</span><br><span class="line">    0x000000e6:    3e0f        .&gt;      SUBS     r6,r6,#0xf</span><br><span class="line">    0x000000e8:    cc0f        ..      LDM      r4!,&#123;r0-r3&#125;</span><br><span class="line">                                  ;1st:</span><br><span class="line">                                  ;r0&#x3D;0x6cc0,r1&#x3D;0x10000000,r3&#x3D;0x6e8,r4&#x3D;0x10f2</span><br><span class="line">                                  ;其实就是Region$$Table区域前4行，见Region$$Table$$Base</span><br><span class="line">                                  ;2nd:</span><br><span class="line">                                  ;r0&#x3D;0x6eb0,r1&#x3D;0x100006e8,r3&#x3D;0x1578,r4&#x3D;0x104</span><br><span class="line">                                  ;其实就是Region$$Table区域后4行，见Region$$Table$$Base</span><br><span class="line">                                  </span><br><span class="line">                                  ;Region$$Table见下面的Region$$Table$$Base</span><br><span class="line">                                  ;如果功能复杂，可能还会存在其它处理函数。</span><br><span class="line">                                  </span><br><span class="line">    0x000000ea:    46b6        .F      MOV      lr,r6</span><br><span class="line">    0x000000ec:    2601        .&amp;      MOVS     r6,#1</span><br><span class="line">    0x000000ee:    4233        3B      TST      r3,r6</span><br><span class="line">    0x000000f0:    d000        ..      BEQ      0xf4 ; __scatterload_null + 28</span><br><span class="line">    0x000000f2:    1afb        ..      SUBS     r3,r7,r3</span><br><span class="line">    0x000000f4:    46a2        .F      MOV      r10,r4</span><br><span class="line">    0x000000f6:    46ab        .F      MOV      r11,r5</span><br><span class="line">    0x000000f8:    4333        3C      ORRS     r3,r3,r6</span><br><span class="line">    0x000000fa:    4718        .G      BX       r3 ;跳转到相应地处理函数</span><br><span class="line">$d</span><br><span class="line">    0x000000fc:    00006ba4    .k..    DCD    27556</span><br><span class="line">    0x00000100:    00006bc4    .k..    DCD    27588</span><br><span class="line">$t</span><br><span class="line">!!handler_zi</span><br><span class="line">__scatterload_zeroinit</span><br><span class="line">    0x00000104:    2300        .#      MOVS     r3,#0</span><br><span class="line">    0x00000106:    2400        .$      MOVS     r4,#0</span><br><span class="line">    0x00000108:    2500        .%      MOVS     r5,#0</span><br><span class="line">    0x0000010a:    2600        .&amp;      MOVS     r6,#0</span><br><span class="line">    0x0000010c:    3a10        .:      SUBS     r2,r2,#0x10</span><br><span class="line">    0x0000010e:    d301        ..      BCC      0x114 ; __scatterload_zeroinit + 16</span><br><span class="line">    0x00000110:    c178        x.      STM      r1!,&#123;r3-r6&#125;</span><br><span class="line">    0x00000112:    d8fb        ..      BHI      0x10c ; __scatterload_zeroinit + 8</span><br><span class="line">    0x00000114:    0752        R.      LSLS     r2,r2,#29</span><br><span class="line">    0x00000116:    d300        ..      BCC      0x11a ; __scatterload_zeroinit + 22</span><br><span class="line">    0x00000118:    c130        0.      STM      r1!,&#123;r4,r5&#125;</span><br><span class="line">    0x0000011a:    d500        ..      BPL      0x11e ; __scatterload_zeroinit + 26</span><br><span class="line">    0x0000011c:    600b        .&#96;      STR      r3,[r1,#0]</span><br><span class="line">    0x0000011e:    4770        pG      BX       lr</span><br><span class="line">    ;......</span><br><span class="line">    </span><br><span class="line">__decompress</span><br><span class="line">__decompress1</span><br><span class="line">__semihosting_library_function</span><br><span class="line">    0x000010f2:    b570        p.      PUSH     &#123;r4-r6,lr&#125;</span><br><span class="line">    0x000010f4:    188c        ..      ADDS     r4,r1,r2</span><br><span class="line">    0x000010f6:    7805        .x      LDRB     r5,[r0,#0]</span><br><span class="line">    ;......</span><br><span class="line">    </span><br><span class="line">Region$$Table$$Base</span><br><span class="line">    0x00006ca0:    00006cc0    .l..    DCD    27840       ;flash起始地址0x00006cc0</span><br><span class="line">    0x00006ca4:    10000000    ....    DCD    268435456   ;ram起始地址0x10000000</span><br><span class="line">    0x00006ca8:    000006e8    ....    DCD    1768        ;数据长度:000006e8</span><br><span class="line">    0x00006cac:    000010f2    ....    DCD    4338        ;处理函数:__decompress</span><br><span class="line">    </span><br><span class="line">    0x00006cb0:    00006eb0    .n..    DCD    28336       ;flash起始地址0x00006eb0</span><br><span class="line">    0x00006cb4:    100006e8    ....    DCD    268437224   ;ram起始地址0x100006e8</span><br><span class="line">    0x00006cb8:    00001578    x...    DCD    5496        ;数据长度0x00001578</span><br><span class="line">    0x00006cbc:    00000104    ....    DCD    260         ;处理函数</span><br><span class="line">Region$$Table$$Limit</span><br></pre></td></tr></table></figure>
+<p><strong>__decompress</strong>函数作用就是将RW数据从rom复制到ram，这些数据在运行过程中会改变，需要在ram中运行。</p>
+<p><strong>__scatterload_zeroinit</strong>函数的作用是将未初始化的全局变量区域清零。在rom代码区不存在该部分，当程序启动时才会出现在ram区域。<a target="_blank" rel="noopener" href="https://interrupt.memfault.com/blog/how-to-write-linker-scripts-for-firmware">Remember, this is the section we put uninitialized static memory in. <code>.bss</code> must be reserved in the memory map, but there is nothing to load, as all variables are initialized to zero. </a></p>
+<h5 id="3、map文件"><a href="#3、map文件" class="headerlink" title="3、map文件"></a>3、map文件</h5><p>再来看map文件中关于栈的部分，如下。这里设置heap大小为0，stack大小为0x600，即1536字节。</p>
+<pre><code>HEAP              0x10001660   Section        0  startup_lpc11xx.o(HEAP)
+STACK             0x10001660   Section     1536  startup_lpc11xx.o(STACK)
+Heap_Mem          0x10001660   Data           0  startup_lpc11xx.o(HEAP)
+Stack_Mem         0x10001660   Data        1536  startup_lpc11xx.o(STACK)
+__initial_sp      0x10001c60   Data           0  startup_lpc11xx.o(STACK)
+
+Code (inc. data)  RO Data   RW Data   ZI Data   Debug   
+
+20824   2016       7016      1768      5496   160460   Grand Totals
+20824   2016       7016       496      5496   160460   ELF Image Totals (compressed)
+20824   2016       7016       496         0        0   ROM Totals
+
+=========================================================
+
+Total RO  Size (Code + RO Data)                27840 (  27.19kB)
+Total RW  Size (RW Data + ZI Data)              7264 (   7.09kB)
+Total ROM Size (Code + RO Data + RW Data)      28336 (  27.67kB)</code></pre>
+<p>“<strong>Grand Totals</strong>”行显示的RW数据时1768字节长度，为何下面两行是496字节？这可能就是压缩（compressed）的缘故。既然有压缩，那么就要解压缩，也就是上面<strong>__decompress</strong>函数的作用。</p>
+<p>最终的bin文件大小就是28336字节。可以通过生成放的bin文件确认，如下图。</p>
+<img src="https://z3.ax1x.com/2021/06/19/RPQqHA.png" alt="RPQqHA.png"  />
+
+<p>也可以打开bin文件，如下图所示，可以看出文件长度就是0x6eb0（28336）.</p>
+<img src="https://z3.ax1x.com/2021/06/19/RPlSgS.png" alt="RPlSgS.png"  />
+
+<p>有些程序会是这样的情况：</p>
+<img src="https://z3.ax1x.com/2021/06/19/RPlY8K.png" alt="RPlY8K.png"  />
+
+<p>这是个演示程序，可以看到RW是8字节。此时的处理函数是<strong>__scatterload_copy</strong>，与上面所说的<strong>__decompress</strong>功能并不相同。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">0x000000e8:    cc0f        ..      LDM      r4!,&#123;r0-r3&#125;      </span><br><span class="line">; 1st:  r0&#x3D;300, r1&#x3D;10000000(IRAM起始地址), r2&#x3D;8(RW-data), r3&#x3D;104(__scatterload_copy)</span><br><span class="line">; 2nd:r0&#x3D;308, r1&#x3D;10000008, r2&#x3D;260(ZI-data), r3&#x3D;120(__scatterload_zeroinit)</span><br><span class="line"></span><br><span class="line">!!handler_copy</span><br><span class="line">__scatterload_copy</span><br><span class="line">    0x00000104:    3a10        .:      SUBS     r2,r2,#0x10</span><br><span class="line">    0x00000106:    d302        ..      BCC      0x10e ; __scatterload_copy + 10</span><br><span class="line">    0x00000108:    c878        x.      LDM      r0!,&#123;r3-r6&#125;</span><br><span class="line">    0x0000010a:    c178        x.      STM      r1!,&#123;r3-r6&#125;</span><br><span class="line">    ;......</span><br></pre></td></tr></table></figure>
+<h5 id="4、空间分布"><a href="#4、空间分布" class="headerlink" title="4、空间分布"></a>4、空间分布</h5><p>按照上面的分析，得到下图，其中PAD是填充字节，为了保证对齐。</p>
+<img src="https://z3.ax1x.com/2021/06/19/RPQr1U.png" alt="RPQr1U.png" style="zoom:;" />
+
+
+
+<p>图中右侧可以理解为程序在rom中的存储分布，而左侧是上电后的数据分布。代码区和只读区位置不变，可以直接运行，RW区在初始化时会复制到0x10000000（ram起始地址）开始的区域，接着是.bss区域、堆区、栈区。</p>
+<p><strong>一句话解释：</strong></p>
+<p>开机上电后，从Region$$Table区域获取相关参数（数据的源地址、目标地址，长度，处理函数），将RW区域数据解压（复制）到ram区域，接着将.bss区域清零，建立堆栈，之后跳转到用户main函数执行。</p>
+<h5 id="5、其它"><a href="#5、其它" class="headerlink" title="5、其它"></a>5、其它</h5><pre><code>Reset_Handler                0x00000185   Thumb Code     8  startup_lpc11xx.o(.text)
+NMI_Handler                  0x0000018d   Thumb Code     2  startup_lpc11xx.o(.text)
+HardFault_Handler            0x0000018f   Thumb Code     2  startup_lpc11xx.o(.text)
+SVC_Handler                  0x00000191   Thumb Code     2  startup_lpc11xx.o(.text)
+PendSV_Handler               0x00000193   Thumb Code     2  startup_lpc11xx.o(.text)</code></pre>
+<p>下图来自bin文件</p>
+<img src="https://z3.ax1x.com/2021/06/19/RPQI1O.png" alt="RPQI1O.png"  />
+
+<p>前4字节时栈指针，即0x1c60，接着4字节时入口函数，地址为0x0185。栈指针与上图中的<strong>__initial_sp</strong>一致，而0x0185处的函数为<strong>Reset_Handler</strong>，如上面map文件所示。继续看bin文件，后续的每4字节为一个地址，与各个中断函数地址相对应，具体含义可以看启动文件中的描述，如下。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">__Vectors       DCD     __initial_sp              ; Top of Stack</span><br><span class="line">                DCD     Reset_Handler             ; Reset Handler</span><br><span class="line">                DCD     NMI_Handler               ; NMI Handler</span><br><span class="line">                DCD     HardFault_Handler         ; Hard Fault Handler</span><br><span class="line">                DCD     0                         ; Reserved</span><br><span class="line">                DCD     0                         ; Reserved</span><br><span class="line">                DCD     0                         ; Reserved</span><br><span class="line">                DCD     0                         ; Reserved</span><br><span class="line">                DCD     0                         ; Reserved</span><br><span class="line">                DCD     0                         ; Reserved</span><br><span class="line">                DCD     0                         ; Reserved</span><br><span class="line">                DCD     SVC_Handler               ; SVCall Handler</span><br><span class="line">                DCD     0                         ; Reserved</span><br><span class="line">                DCD     0                         ; Reserved</span><br><span class="line">                DCD     PendSV_Handler            ; PendSV Handler</span><br><span class="line">                DCD     SysTick_Handler           ; SysTick Handler</span><br><span class="line"></span><br><span class="line">                ;......</span><br><span class="line">                DCD     CAN_IRQHandler            ; 16+13: CAN</span><br><span class="line">                DCD     SSP1_IRQHandler           ; 16+14: SSP1</span><br><span class="line">                DCD     I2C_IRQHandler            ; 16+15: I2C</span><br><span class="line">                DCD     TIMER16_0_IRQHandler      ; 16+16: 16-bit Counter-Timer 0</span><br><span class="line">                DCD     TIMER16_1_IRQHandler      ; 16+17: 16-bit Counter-Timer 1</span><br><span class="line">                DCD     TIMER32_0_IRQHandler      ; 16+18: 32-bit Counter-Timer 0</span><br><span class="line">                DCD     TIMER32_1_IRQHandler      ; 16+19: 32-bit Counter-Timer 1</span><br><span class="line">                DCD     SSP0_IRQHandler           ; 16+20: SSP0</span><br><span class="line">                DCD     UART_IRQHandler           ; 16+21: UART</span><br><span class="line">                ;......</span><br></pre></td></tr></table></figure>
+
+
+<h5 id="参考"><a href="#参考" class="headerlink" title="* 参考"></a>* 参考</h5><p>参考网上诸多资料，没办法一一列出，在此一并致谢。</p>
+<ul>
+<li><p><a target="_blank" rel="noopener" href="https://bbs.21ic.com/icview-2934034-1-1.html?fromuser=%EF%BC%8C%E8%AF%A5%E8%B5%84%E6%96%99%E6%AF%94%E8%BE%83%E8%AF%A6%E7%BB%86%EF%BC%8C%E6%9C%AC%E6%96%87%E6%9C%80%E5%BC%80%E5%A7%8B%E5%B0%B1%E6%98%AF%E5%8F%82%E8%80%83%E8%AF%A5%E6%96%87%E7%9A%84%E3%80%82">https://bbs.21ic.com/icview-2934034-1-1.html?fromuser=，该资料比较详细，本文最开始就是参考该文的。</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_39869569/article/details/104851263">https://blog.csdn.net/weixin_39869569/article/details/104851263</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/shenlong1356/article/details/104597292">https://blog.csdn.net/shenlong1356/article/details/104597292</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://interrupt.memfault.com/blog/zero-to-main-1">https://interrupt.memfault.com/blog/zero-to-main-1</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://interrupt.memfault.com/blog/how-to-write-linker-scripts-for-firmware">https://interrupt.memfault.com/blog/how-to-write-linker-scripts-for-firmware</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_39869569/article/details/104851263">https://blog.csdn.net/weixin_39869569/article/details/104851263</a></p>
+</li>
+</ul>
+
     </div>
 
     
@@ -203,6 +308,9 @@
     
 
       <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/boot/" rel="tag"># boot</a>
+          </div>
 
         
 
@@ -272,6 +380,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-5"><a class="nav-link" href="#0%E3%80%81%E8%AF%B4%E6%98%8E"><span class="nav-number">1.</span> <span class="nav-text">0、说明</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#1%E3%80%81%E5%87%BD%E6%95%B0%E5%85%A5%E5%8F%A3"><span class="nav-number">2.</span> <span class="nav-text">1、函数入口</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2%E3%80%81%E5%8F%8D%E6%B1%87%E7%BC%96"><span class="nav-number">3.</span> <span class="nav-text">2、反汇编</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3%E3%80%81map%E6%96%87%E4%BB%B6"><span class="nav-number">4.</span> <span class="nav-text">3、map文件</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4%E3%80%81%E7%A9%BA%E9%97%B4%E5%88%86%E5%B8%83"><span class="nav-number">5.</span> <span class="nav-text">4、空间分布</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#5%E3%80%81%E5%85%B6%E5%AE%83"><span class="nav-number">6.</span> <span class="nav-text">5、其它</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">7.</span> <span class="nav-text">* 参考</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -298,7 +407,7 @@
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">13</span>
+        <span class="site-state-item-count">14</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
