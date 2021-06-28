@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"aya-lxl.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="i.MX RT1052 flexspi启动方式 0、关键字">
+<meta property="og:type" content="article">
+<meta property="og:title" content="flexspi启动方式">
+<meta property="og:url" content="https://aya-lxl.github.io/2021/06/28/flexspi%E5%90%AF%E5%8A%A8%E6%96%B9%E5%BC%8F/index.html">
+<meta property="og:site_name" content="直到海角天涯">
+<meta property="og:description" content="i.MX RT1052 flexspi启动方式 0、关键字">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://z3.ax1x.com/2021/06/28/RN5C0H.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/06/28/RN53hq.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/06/28/RN5RDe.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/06/28/RN5LDg.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/06/28/RNICvT.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/06/28/RNIVa9.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/06/28/RNIlrD.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/06/28/RNIBqg.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/06/28/RNIIZ4.png">
+<meta property="og:image" content="https://z3.ax1x.com/2021/06/28/RNIbJ1.png">
+<meta property="article:published_time" content="2021-06-28T09:22:53.000Z">
+<meta property="article:modified_time" content="2021-06-28T11:41:43.256Z">
+<meta property="article:author" content="aya_lxl@163.com">
+<meta property="article:tag" content="boot">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://z3.ax1x.com/2021/06/28/RN5C0H.png">
+
+<link rel="canonical" href="https://aya-lxl.github.io/2021/06/28/flexspi%E5%90%AF%E5%8A%A8%E6%96%B9%E5%BC%8F/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>flexspi启动方式 | 直到海角天涯</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">直到海角天涯</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://aya-lxl.github.io/2021/06/28/flexspi%E5%90%AF%E5%8A%A8%E6%96%B9%E5%BC%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="aya_lxl@163.com">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="直到海角天涯">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          flexspi启动方式
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-06-28 17:22:53 / 修改时间：19:41:43" itemprop="dateCreated datePublished" datetime="2021-06-28T17:22:53+08:00">2021-06-28</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%8D%95%E7%89%87%E6%9C%BA/" itemprop="url" rel="index"><span itemprop="name">单片机</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>i.MX RT1052 flexspi启动方式</p>
+<h4 id="0、关键字"><a href="#0、关键字" class="headerlink" title="0、关键字"></a>0、关键字</h4><p>i.MX RT1052</p>
+<p>keil 5</p>
+<p>分散加载</p>
+<p>外部SDRAM</p>
+<h4 id="1、Program-image"><a href="#1、Program-image" class="headerlink" title="1、Program image"></a>1、Program image</h4><p><img src="https://z3.ax1x.com/2021/06/28/RN5C0H.png" alt="RN5C0H.png"></p>
+<p>（IMXRT1050RM，8.7.1）</p>
+<h4 id="2、IVT（Image-Vector-Table）"><a href="#2、IVT（Image-Vector-Table）" class="headerlink" title="2、IVT（Image Vector Table）"></a>2、IVT（Image Vector Table）</h4><p>对于FlexSPI NOR而言，偏移为固定0x1000字节，可从下面的bin文件看出。IVT包含程序入口，DCD数据，以及其它一些boot期间会用到的数据。</p>
+<p><img src="https://z3.ax1x.com/2021/06/28/RN53hq.png" alt="RN53hq.png"></p>
+<p>编译生成的bin文件，从0x1000开始就是IVT数据，大小32字节。</p>
+<p><img src="https://z3.ax1x.com/2021/06/28/RN5RDe.png" alt="RN5RDe.png"></p>
+<p>从上图可以看出，entry地址为0x60002000，定位到该地址处，如下图所示。</p>
+<p><img src="https://z3.ax1x.com/2021/06/28/RN5LDg.png" alt="RN5LDg.png"></p>
+<p>从0x60002000地址开始的首先是栈指针，指向0x80080000。接下来的0x600024F9才是Reset_Handler的地址，如下述map文件所示。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Reset_Handler           <span class="number">0x600024f9</span>   Thumb Code    <span class="number">56</span>  startup_mimxrt1052.o(.text)</span><br><span class="line">NMI_Handler             <span class="number">0x60002531</span>   Thumb Code     <span class="number">2</span>  startup_mimxrt1052.o(.text)</span><br><span class="line">HardFault_Handler       <span class="number">0x60002533</span>   Thumb Code     <span class="number">2</span>  startup_mimxrt1052.o(.text)</span><br><span class="line">MemManage_Handler       <span class="number">0x60002535</span>   Thumb Code     <span class="number">2</span>  startup_mimxrt1052.o(.text)</span><br><span class="line">BusFault_Handler        <span class="number">0x60002537</span>   Thumb Code     <span class="number">2</span> startup_mimxrt1052.o(.text)</span><br><span class="line">UsageFault_Handler      <span class="number">0x60002539</span>   Thumb Code     <span class="number">2</span>  startup_mimxrt1052.o(.text)</span><br><span class="line">SVC_Handler             <span class="number">0x6000253b</span>   Thumb Code     <span class="number">2</span> startup_mimxrt1052.o(.text)</span><br><span class="line">DebugMon_Handler        <span class="number">0x6000253d</span>   Thumb Code     <span class="number">2</span> startup_mimxrt1052.o(.text)</span><br><span class="line">DMA0_DMA16_IRQHandler   <span class="number">0x60002543</span>   Thumb Code     <span class="number">4</span> startup_mimxrt1052.o(.text)</span><br><span class="line">DMA1_DMA17_IRQHandler   <span class="number">0x60002547</span>   Thumb Code     <span class="number">4</span> startup_mimxrt1052.o(.text)</span><br></pre></td></tr></table></figure>
+
+
+<p>下面的部分是用于生成IVT相关部分的代码。定义段时使用<strong>attribute</strong>((section(“.boot_hdr.ivt”)))。</p>
+<p>fsl_flexspi_nor_boot.h文件</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> DCD_ADDRESS           dcd_data</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> BOOT_DATA_ADDRESS     &amp;boot_data</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> CSF_ADDRESS           0</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> IVT_RSVD             (uint32_t)(0x00000000)</span></span><br></pre></td></tr></table></figure>
+<p>fsl_flexspi_nor_boot.c文件</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&quot;fsl_flexspi_nor_boot.h&quot;</span></span></span><br><span class="line"></span><br><span class="line">__attribute__((section(<span class="string">&quot;.boot_hdr.ivt&quot;</span>)))</span><br><span class="line"></span><br><span class="line"><span class="comment">/************************************* </span></span><br><span class="line"><span class="comment"> *  IVT Data </span></span><br><span class="line"><span class="comment"> *************************************/</span></span><br><span class="line"><span class="keyword">const</span> ivt image_vector_table = &#123;</span><br><span class="line">  IVT_HEADER,                        <span class="comment">/* IVT Header */</span></span><br><span class="line">  IMAGE_ENTRY_ADDRESS,               <span class="comment">/* Image Entry Function */</span></span><br><span class="line">  IVT_RSVD,                          <span class="comment">/* Reserved = 0 */</span></span><br><span class="line">  (<span class="keyword">uint32_t</span>)DCD_ADDRESS,             <span class="comment">/* Address where DCD information is stored */</span></span><br><span class="line">  (<span class="keyword">uint32_t</span>)BOOT_DATA_ADDRESS,       <span class="comment">/* Address where BOOT Data Structure is stored */</span></span><br><span class="line">  (<span class="keyword">uint32_t</span>)&amp;image_vector_table,     <span class="comment">/* Pointer to IVT Self (absolute address */</span></span><br><span class="line">  (<span class="keyword">uint32_t</span>)CSF_ADDRESS,             <span class="comment">/* Address where CSF file is stored */</span></span><br><span class="line">  IVT_RSVD                           <span class="comment">/* Reserved = 0 */</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">__attribute__((section(<span class="string">&quot;.boot_hdr.boot_data&quot;</span>)))</span><br><span class="line"></span><br><span class="line"><span class="comment">/************************************* </span></span><br><span class="line"><span class="comment"> *  Boot Data </span></span><br><span class="line"><span class="comment"> *************************************/</span></span><br><span class="line"><span class="keyword">const</span> BOOT_DATA_T boot_data = &#123;</span><br><span class="line">  FLASH_BASE,                 <span class="comment">/* boot start location */</span></span><br><span class="line">  FLASH_SIZE,                 <span class="comment">/* size */</span></span><br><span class="line">  PLUGIN_FLAG,                <span class="comment">/* Plugin flag*/</span></span><br><span class="line">  <span class="number">0xFFFFFFFF</span>  				  <span class="comment">/* empty - extra data word */</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+<h4 id="3、FlexSPI接口配置"><a href="#3、FlexSPI接口配置" class="headerlink" title="3、FlexSPI接口配置"></a>3、FlexSPI接口配置</h4><p>The ROM expects the 512-byte FlexSPI NOR configuration parameters as explained in next section to be present at offset 0 in Serial NOR flash. The ROM reads these configuration parameters using the read command specified by BOOT_CFG2[2:0] with Serial clock operating at 30 MHz.</p>
+<p>In the second step, ROM configures FlexSPI interface with the parameters provided in configuration block read from Serial NOR flash and starts the boot procedure. Refer to Table 8-17 for details regarding FlexSPI configuration parameters and to the FlexSPI NOR boot flow chart for detailed boot flow chart of FlexSPI NOR. </p>
+<p>（IMXRT1050RM）</p>
+<p>evkbimxrt1050_flexspi_nor_config.c文件，其中具体的含义暂时不去细究，这里只是作为流程介绍。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//对nor flash配置</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&quot;evkbimxrt1050_flexspi_nor_config.h&quot;</span></span></span><br><span class="line"></span><br><span class="line">__attribute__((section(<span class="string">&quot;.boot_hdr.conf&quot;</span>)))</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">flexspi_nor_config_t</span> qspiflash_config = &#123;</span><br><span class="line">    .memConfig =</span><br><span class="line">        &#123;</span><br><span class="line">            .tag = FLEXSPI_CFG_BLK_TAG,</span><br><span class="line">            .version = FLEXSPI_CFG_BLK_VERSION,</span><br><span class="line">            .readSampleClkSrc = kFlexSPIReadSampleClk_LoopbackFromDqsPad,<span class="comment">//lxl</span></span><br><span class="line">            .csHoldTime = <span class="number">3u</span>,</span><br><span class="line">            .csSetupTime = <span class="number">3u</span>,</span><br><span class="line">            .columnAddressWidth = <span class="number">0u</span>,<span class="comment">//lxl</span></span><br><span class="line">            .configCmdEnable = <span class="number">0u</span>,</span><br><span class="line">            <span class="comment">// Enable SDR mode, Wordaddassable, Safe configuration, Differential clock</span></span><br><span class="line">            .controllerMiscOption = <span class="number">0u</span>,<span class="comment">//lxl</span></span><br><span class="line">            .deviceType = kFlexSpiDeviceType_SerialNOR,</span><br><span class="line">            .sflashPadType = kSerialFlash_4Pads,<span class="comment">//lxl</span></span><br><span class="line">            .serialClkFreq = kFlexSpiSerialClk_133MHz,</span><br><span class="line">            .lutCustomSeqEnable = <span class="number">0u</span>,</span><br><span class="line">            .sflashA1Size = <span class="number">8u</span> * <span class="number">1024u</span> * <span class="number">1024u</span>, <span class="comment">//8MB //lxl</span></span><br><span class="line">            .lookupTable =</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="comment">// Fast read sequence</span></span><br><span class="line">                    [<span class="number">0</span>] =  FLEXSPI_LUT_SEQ(CMD_SDR, FLEXSPI_1PAD, <span class="number">0xEB</span>, RADDR_SDR, FLEXSPI_4PAD, <span class="number">0x18</span>),</span><br><span class="line">                    [<span class="number">1</span>] =  FLEXSPI_LUT_SEQ(DUMMY_SDR, FLEXSPI_4PAD, <span class="number">0x06</span>, READ_SDR, FLEXSPI_4PAD, <span class="number">0x02</span>),</span><br><span class="line">                    [<span class="number">2</span>] =  FLEXSPI_LUT_SEQ(STOP, <span class="number">0</span>, <span class="number">0</span>, STOP, <span class="number">0</span>, <span class="number">0</span>),</span><br><span class="line">                    [<span class="number">3</span>] =  FLEXSPI_LUT_SEQ(STOP, <span class="number">0</span>, <span class="number">0</span>, STOP, <span class="number">0</span>, <span class="number">0</span>),</span><br><span class="line">                &#125;,</span><br><span class="line">        &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p><img src="https://z3.ax1x.com/2021/06/28/RNICvT.png" alt="RNICvT.png"></p>
+<p>该部分数据长度为512字节。</p>
+<h4 id="4、DCD（Device-Configuration-Data）"><a href="#4、DCD（Device-Configuration-Data）" class="headerlink" title="4、DCD（Device Configuration Data）"></a>4、DCD（Device Configuration Data）</h4><p>Upon reset, the chip uses the default register values for all peripherals in the system.However, these settings typically are not ideal for achieving the optimal system performance and there are even some peripherals that must be configured before they can be used.</p>
+<p><code>The DCD is a configuration information contained in the program image (external to the ROM) that the ROM interprets to configure various peripherals on the chip</code>.For example, some components (such as SDRAM) require some sequence of register programming as a part of the configuration before it is ready to be used. The DCD feature can be used to program the SEMC register to the optimal settings.</p>
+<p>The ROM determines the location of the DCD table based on the information located in the Image Vector Table (IVT). See Image Vector Table and Boot Data for more details. The DCD table shown below is a big-endian byte array of the allowable DCD commands. The maximum size of the DCD is limited to 1768B.</p>
+<p>（摘自IMXRT1050RM 8.7.2）</p>
+<p>DCD区域也有具体的格式，可参考IMXRT1050RM文档。</p>
+<p><img src="https://z3.ax1x.com/2021/06/28/RNIVa9.png" alt="RNIVa9.png"></p>
+<p><img src="https://z3.ax1x.com/2021/06/28/RNIlrD.png" alt="RNIlrD.png"></p>
+<p>该格式简单理解为：首先一个寄存器地址，之后以该寄存器的设置值，从下述代码<code>dcd_data</code>定义处也可以看出，之后依次按照这样的顺序处理。</p>
+<p>evkbimxrt1050_sdram_ini_dcd.c文件。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&quot;evkbimxrt1050_sdram_ini_dcd.h&quot;</span></span></span><br><span class="line"></span><br><span class="line">__attribute__((section(<span class="string">&quot;.boot_hdr.dcd_data&quot;</span>)))</span><br><span class="line"></span><br><span class="line"><span class="comment">/*************************************</span></span><br><span class="line"><span class="comment"> *  DCD Data</span></span><br><span class="line"><span class="comment"> *************************************/</span></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">uint8_t</span> dcd_data[] = &#123;</span><br><span class="line">    <span class="comment">/*0000*/</span> DCD_TAG_HEADER,</span><br><span class="line">    <span class="number">0x04</span>,</span><br><span class="line">    <span class="number">0x30</span>,</span><br><span class="line">    <span class="number">0x41</span>,</span><br><span class="line">    <span class="number">0xCC</span>,</span><br><span class="line">    <span class="number">0x03</span>,</span><br><span class="line">    <span class="number">0xAC</span>,</span><br><span class="line">    <span class="number">0x04</span>,</span><br><span class="line">    <span class="number">0x40</span>,</span><br><span class="line">    <span class="number">0x0F</span>,</span><br><span class="line">    <span class="number">0xC0</span>,</span><br><span class="line">    <span class="number">0x68</span>,</span><br><span class="line">    <span class="number">0xFF</span>,</span><br><span class="line">    <span class="number">0xFF</span>,</span><br><span class="line">    <span class="number">0xFF</span>,</span><br><span class="line">    <span class="number">0xFF</span>,</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h4 id="5、分散加载文件"><a href="#5、分散加载文件" class="headerlink" title="5、分散加载文件"></a>5、分散加载文件</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//m_flash_config域起始地址,定义在SPI FLASH里面(8MB)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> m_flash_config_start   0x60000000</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> m_flash_config_size    0x00001000	<span class="comment">//m_flash_config域大小</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> m_ivt_start            0x60001000	<span class="comment">//m_ivt域起始地址,定义在SPI FLASH里面(8MB)</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> m_ivt_size             0x00001000	<span class="comment">//m_ivt域大小</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">//m_interrupts域起始地址,定义在SPI FLASH里面(8MB)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> m_interrupts_start    0x60002000</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> m_interrupts_size     0x00000400	<span class="comment">//m_interrupts域大小</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> m_text_start          0x60002400	<span class="comment">//m_text域起始地址,定义在SPI FLASH里面(8MB)</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> m_text_size           0x1F7FDC00	<span class="comment">//m_text域大小</span></span></span><br><span class="line"> </span><br><span class="line"><span class="comment">//#define m_data_start          0x20200000	//m_data域起始地址,定义在OCRAM里面(256KB)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> m_data_start         0x80000000		<span class="comment">//m_data域起始地址,定义在SDRAM里面</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> m_data_size          0x00080000		<span class="comment">//m_data域大小</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">//m_ncache域起始地址,定义在SDRAM里面(5M开始,总共27MB),必须初始化SDRAM,才能使用此域</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> m_ncache_start       0x80500000</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> m_ncache_size        0x00200000		<span class="comment">//m_ncache域大小</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> (defined(__stack_size__))</span></span><br><span class="line">  <span class="meta">#<span class="meta-keyword">define</span> Stack_Size                   __stack_size__</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line">  <span class="meta">#<span class="meta-keyword">define</span> Stack_Size                   0x0800</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span>	</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">if</span> (defined(__heap_size__))</span></span><br><span class="line">  <span class="meta">#<span class="meta-keyword">define</span> Heap_Size                    __heap_size__</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line">  <span class="meta">#<span class="meta-keyword">define</span> Heap_Size                    0x0000</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">LR_m_rom_config m_flash_config_start m_flash_config_size &#123;   ; load region size_region</span><br><span class="line">	RW_m_config_text m_flash_config_start m_flash_config_size &#123; ; load address = execution address</span><br><span class="line">	* (.boot_hdr.conf, +FIRST)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">LR_m_rom_ivt m_ivt_start m_ivt_size &#123;   ; load region size_region</span><br><span class="line">	RW_m_ivt_text m_ivt_start m_ivt_size &#123; ; load address = execution address</span><br><span class="line">	* (.boot_hdr.ivt, +FIRST)</span><br><span class="line">	* (.boot_hdr.boot_data)</span><br><span class="line">	* (.boot_hdr.dcd_data)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">ER_m_text m_text_start m_text_size &#123;</span><br><span class="line">  ER_m_text m_text_start m_text_size &#123; ; load address = execution address</span><br><span class="line">    * (InRoot$$Sections)</span><br><span class="line">    .ANY (+RO)</span><br><span class="line">  &#125;</span><br><span class="line">  RW_m_data m_data_start m_data_size-Stack_Size-Heap_Size &#123; ; RW data</span><br><span class="line">    .ANY (+RW +ZI)</span><br><span class="line">    *(m_usb_dma_init_data)</span><br><span class="line">    *(m_usb_dma_noninit_data)</span><br><span class="line">  &#125;</span><br><span class="line">  ARM_LIB_HEAP +<span class="number">0</span> EMPTY Heap_Size &#123;    ; Heap region growing up</span><br><span class="line">  &#125;</span><br><span class="line">  ARM_LIB_STACK m_data_start+m_data_size EMPTY -Stack_Size &#123; ; Stack region growing down</span><br><span class="line">  &#125;</span><br><span class="line">  RW_m_ncache m_ncache_start m_ncache_size &#123; ; ncache RW data</span><br><span class="line">    * (NonCacheable.init)</span><br><span class="line">    * (NonCacheable)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">LR_m_interrupts m_interrupts_start m_interrupts_size &#123;		<span class="comment">//LR_m_interrupts加载域</span></span><br><span class="line">  VECTOR_ROM m_interrupts_start m_interrupts_size &#123; 		<span class="comment">//VECTOR_ROM运行域,起始地址为:m_interrupts_start,大小为:m_interrupts_size</span></span><br><span class="line">    * (RESET,+FIRST)	<span class="comment">//优先(+FIRST)将RESET(中断向量表)段放这个域,实际上就是把中断向量表拷贝到m_interrupts_start</span></span><br><span class="line">  &#125;		<span class="comment">//RESET是一个段名,表示中断向量表(在.s文件定义);+FIRST表示时第一个要加载的.</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>分散加载文件中各个段的定义位置分布在多个文件中，上述代码是删除条件编译之后的部分。编译器按照分散加载文件，将各个段放到相应地地址处。</p>
+<h4 id="6、编译"><a href="#6、编译" class="headerlink" title="6、编译"></a>6、编译</h4><p>如同上述bin文件所示。中间没有数据的部分填充0xFF。</p>
+<p><strong>一个需要注意的地方</strong></p>
+<p><img src="https://z3.ax1x.com/2021/06/28/RNIBqg.png" alt="RNIBqg.png"></p>
+<p>如上图方框里面的选项，如果是<code>—bin</code>的话，那么会生成4个二进制文件。</p>
+<p><img src="https://z3.ax1x.com/2021/06/28/RNIIZ4.png" alt="RNIIZ4.png"></p>
+<p>这是因为存在多个加载段的原因，使用<code>-–bincombined</code>选项后，生成一个二进制文件，就是上面看到的bin文件。<code>-–bincombined</code>说明如下（keil帮助文档）。</p>
+<p><img src="https://z3.ax1x.com/2021/06/28/RNIbJ1.png" alt="RNIbJ1.png"></p>
+<h4 id="7、一句话总结"><a href="#7、一句话总结" class="headerlink" title="7、一句话总结"></a>7、一句话总结</h4><ol>
+<li>上电，根据启动方式选择，内部bootROM按照寄存器默认配置运行，读取Flex Norflash开始部分，重新设置FlexSPI接口。</li>
+<li>读取image，初始化SDRAM。</li>
+<li>__main(RW数据复制、解压等，bss清零，堆栈建立等，之前分析过。)</li>
+<li>main()</li>
+</ol>
+<p>需要说明的是，如分散加载文件所示，RW数据是在外部SDRAM中运行的，所以需要在程序正式运行前配置SDRAM。程序开始运行后，就不能再对SDRAM进行配置了，否则会造成死机。当然也可以在内部OCRAM运行，此时可以将外部SDRAM配置放到main函数中处理。</p>
+<h4 id="结尾"><a href="#结尾" class="headerlink" title="* 结尾"></a>* 结尾</h4><p>在研究过程中参考了很多资料，如有侵权，联系删除（<a href="mailto:&#97;&#x79;&#x61;&#x5f;&#108;&#x78;&#108;&#64;&#49;&#54;&#x33;&#46;&#99;&#111;&#x6d;">&#97;&#x79;&#x61;&#x5f;&#108;&#x78;&#108;&#64;&#49;&#54;&#x33;&#46;&#99;&#111;&#x6d;</a>）。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/boot/" rel="tag"># boot</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/06/18/main/" rel="prev" title="__main">
+      <i class="fa fa-chevron-left"></i> __main
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#0%E3%80%81%E5%85%B3%E9%94%AE%E5%AD%97"><span class="nav-number">1.</span> <span class="nav-text">0、关键字</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1%E3%80%81Program-image"><span class="nav-number">2.</span> <span class="nav-text">1、Program image</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2%E3%80%81IVT%EF%BC%88Image-Vector-Table%EF%BC%89"><span class="nav-number">3.</span> <span class="nav-text">2、IVT（Image Vector Table）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3%E3%80%81FlexSPI%E6%8E%A5%E5%8F%A3%E9%85%8D%E7%BD%AE"><span class="nav-number">4.</span> <span class="nav-text">3、FlexSPI接口配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4%E3%80%81DCD%EF%BC%88Device-Configuration-Data%EF%BC%89"><span class="nav-number">5.</span> <span class="nav-text">4、DCD（Device Configuration Data）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5%E3%80%81%E5%88%86%E6%95%A3%E5%8A%A0%E8%BD%BD%E6%96%87%E4%BB%B6"><span class="nav-number">6.</span> <span class="nav-text">5、分散加载文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6%E3%80%81%E7%BC%96%E8%AF%91"><span class="nav-number">7.</span> <span class="nav-text">6、编译</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#7%E3%80%81%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%80%BB%E7%BB%93"><span class="nav-number">8.</span> <span class="nav-text">7、一句话总结</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BB%93%E5%B0%BE"><span class="nav-number">9.</span> <span class="nav-text">* 结尾</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">aya_lxl@163.com</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">25</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">aya_lxl@163.com</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
